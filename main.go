@@ -1,11 +1,12 @@
-package main
+package main 
 
-import (
-	r "groupietracker/routeur"
-	t "groupietracker/temps"
+import
+(
+    "groupietracker/temps"
+    "groupietracker/routeur"
 )
 
-func main() {
-	t.InitTemplate()
-	r.InitServe()
+func main(){
+    temps.InitTemplate()
+    routeur.InitServe()
 }
