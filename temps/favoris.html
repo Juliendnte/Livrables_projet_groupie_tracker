@@ -1,0 +1,73 @@
+{{define "fav"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoris</title>
+    <link rel="icon" href="/static/img/logo/spot.png" />
+
+</head>
+
+<body>
+    <div class="global">
+        <div>
+            {{if eq .Utilisateur.Img "vert"}}
+            <a href="/logout" class="vert">
+                <p>{{.Utilisateur.Letter}}</p>
+            </a>
+            {{else}}
+            <a href="/logout">
+                <img src="/static/img/{{.Utilisateur.Img}}" class="pdp" />
+            </a>
+            {{end}}
+            <p>{{.Utilisateur.Name}}</p>
+        </div>
+        <div class="favoris">
+            <div class="artist">
+                {{range .Utilisateur.FavorisArtist}}
+                <div class="profil">
+                    {{range .Images}}
+                    <img src="{{.URL}}" alt="pdp_artiste">
+                    {{end}}
+                    <p>{{.Name}}</p>
+                </div>
+                {{end}}
+            </div>
+            <div class="album">
+                {{range .Utilisateur.FavorisAlbum}}
+                <div class="profil">
+                    {{range .Images}}
+                    <img src="{{.URL}}" alt="pdp_artiste">
+                    {{end}}
+                    <p>{{.Name}}</p>
+                </div>
+                {{end}}
+            </div>
+            <div class="track">
+                {{range .Utilisateur.FavorisTrack}}
+                <div class="profil">
+                    {{range .Images}}
+                    <img src="{{.URL}}" alt="pdp_artiste">
+                    {{end}}
+                    <p>{{.Name}}</p>
+                </div>
+                {{end}}
+            </div>
+            <div class="playlist">
+                {{range .Utilisateur.FavorisPlaylist}}
+                <div class="profil">
+                    {{range .Images}}
+                    <img src="{{.URL}}" alt="pdp_artiste">
+                    {{end}}
+                    <p>{{.Name}}</p>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+{{end}}
