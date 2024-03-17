@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	ytb "github.com/kkdai/youtube/v2"
@@ -176,7 +177,144 @@ func GenerateID() int {
 	return Id
 }
 
-// Téléchargement d'une vidéo ytb
+// Fonction pour savoir si un élément est dans la list
+func IsInList(lst []string, s string) bool { // on regarde si une lettre est dans la liste ou pas
+	for _, c := range lst {
+		if string(c) == s {
+			return true
+		}
+	}
+	return false
+}
+
+func IsElementPresent(lst1, lst2 []string) bool {
+	for _, c1 := range lst1 {
+		for _, c2 := range lst2 {
+			if c2 == c1 {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// Fonction pour transformer une liste en string
+func TransformSlice(s []string) string { //Met un []string en mot
+	var str string
+	for _, c := range s {
+		str += c + " "
+	}
+	return str
+}
+
+// Fonction pour generer une lettre
+func GetRandomLetter() string {
+	return string('a' + rune(rand.Intn(26)))
+}
+
+// Fonction pour generer un chiffre entre 0 et 988
+func RandOffset() string {
+	return strconv.Itoa(rand.Intn(988))
+}
+
+//Fonction trie insertion pour le nom 
+func (arrayToSort *Playlist)InsertionSortPlaylist() {
+	for index := 1; index < len(arrayToSort.Playlists.Items); index++ {
+		currentItem := arrayToSort.Playlists.Items[index]
+		currentLeftIndex := index - 1
+
+		for currentLeftIndex >= 0 && arrayToSort.Playlists.Items[currentLeftIndex].Name > currentItem.Name {
+			arrayToSort.Playlists.Items[currentLeftIndex+1] = arrayToSort.Playlists.Items[currentLeftIndex]
+			currentLeftIndex -= 1
+		}
+
+		arrayToSort.Playlists.Items[currentLeftIndex+1] = currentItem
+	}
+}
+
+func (arrayToSort *Artists)InsertionSortArtists() {
+	for index := 1; index < len(arrayToSort.Artists.Items); index++ {
+		currentItem := arrayToSort.Artists.Items[index]
+		currentLeftIndex := index - 1
+
+		for currentLeftIndex >= 0 && arrayToSort.Artists.Items[currentLeftIndex].Name > currentItem.Name {
+			arrayToSort.Artists.Items[currentLeftIndex+1] = arrayToSort.Artists.Items[currentLeftIndex]
+			currentLeftIndex -= 1
+		}
+
+		arrayToSort.Artists.Items[currentLeftIndex+1] = currentItem
+	}
+}
+
+func (arrayToSort *Albums)InsertionSortAlbums() {
+	for index := 1; index < len(arrayToSort.Albums.Items); index++ {
+		currentItem := arrayToSort.Albums.Items[index]
+		currentLeftIndex := index - 1
+
+		for currentLeftIndex >= 0 && arrayToSort.Albums.Items[currentLeftIndex].Name > currentItem.Name {
+			arrayToSort.Albums.Items[currentLeftIndex+1] = arrayToSort.Albums.Items[currentLeftIndex]
+			currentLeftIndex -= 1
+		}
+
+		arrayToSort.Albums.Items[currentLeftIndex+1] = currentItem
+	}
+}
+
+func (arrayToSort *Track)InsertionSortTracks() {
+	for index := 1; index < len(arrayToSort.Tracks.Items); index++ {
+		currentItem := arrayToSort.Tracks.Items[index]
+		currentLeftIndex := index - 1
+
+		for currentLeftIndex >= 0 && arrayToSort.Tracks.Items[currentLeftIndex].Name > currentItem.Name {
+			arrayToSort.Tracks.Items[currentLeftIndex+1] = arrayToSort.Tracks.Items[currentLeftIndex]
+			currentLeftIndex -= 1
+		}
+
+		arrayToSort.Tracks.Items[currentLeftIndex+1] = currentItem
+	}
+}
+
+
+func (alb AlbumPrecision)TempsAlbum() string {
+	var miliseconds int
+	for _, c := range alb.Tracks.Items {
+		miliseconds += c.DurationMs
+	}
+	return Tmps(miliseconds)
+}
+
+func (alb PlaylistPrecision)TempsPlaylist() string {
+	var miliseconds int
+	for _, c := range alb.Tracks.Items {
+		miliseconds += c.Track.DurationMs
+	}
+	return Tmps(miliseconds)
+}
+
+//Calcul de miliseconds en heure ou minute
+func Tmps(miliseconds int) string {
+	var temps Duree
+
+	temps.heure = miliseconds / (1000 * 3600)
+	miliseconds %= 1000 * 3600
+
+	temps.min = miliseconds / (1000 * 60)
+	miliseconds %= 1000 * 60
+	
+	temps.sec = miliseconds / 1000
+	
+	return formatDuree(temps)
+}
+
+//Affichage du temps comme sur spotify
+func formatDuree(temps Duree) string {
+	if temps.heure > 0 {
+		return strconv.Itoa(temps.heure) + " heure " + strconv.Itoa(temps.min) + " min "
+	}
+	return strconv.Itoa(temps.min) + ":" + strconv.Itoa(temps.sec)
+}
+
+//Téléchargement d'une vidéo ytb
 func Download(videoID string) (string, error) {
 	client := ytb.Client{}
 
@@ -208,7 +346,7 @@ func Download(videoID string) (string, error) {
 	return videoID, nil
 }
 
-// Retourne le nombre de like d'une vidéo sur ytb
+//Retourne le nombre de like d'une vidéo sur ytb
 func Like(searchTerm string) int {
 	client := &http.Client{
 		Transport: &transport.APIKey{Key: apiKeyYtb},
@@ -239,7 +377,7 @@ func Like(searchTerm string) int {
 	}
 }
 
-// Retourne l'id d'une vidéo sur ytb
+//Retourne l'id d'une vidéo sur ytb
 func IdYtb(search string) string {
 	client := &http.Client{
 		Transport: &transport.APIKey{Key: apiKeyYtb},
@@ -248,7 +386,7 @@ func IdYtb(search string) string {
 	service, err := youtube.New(client)
 	if err != nil {
 		fmt.Printf("Erreur lors de la création du client YouTube : %v", err)
-		return "dQw4w9WgXcQ" //Rick Roll
+		return "dQw4w9WgXcQ"//Rick Roll
 	}
 
 	searchResponse, err := service.Search.List([]string{"id", "snippet"}).Q(search).Type("video").MaxResults(1).Do()
