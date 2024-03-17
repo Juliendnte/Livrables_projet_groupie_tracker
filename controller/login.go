@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 )
 
 var err error
@@ -22,6 +23,7 @@ func Unlog(w http.ResponseWriter, r *http.Request) {
 // Fonction pour se connecter
 func Login(w http.ResponseWriter, r *http.Request) {
 	if back.Jeu.UtilisateurData.Connect {
+		http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
 		return
 	}
 	//back.Jeu.UtilisateurData = back.UserData
@@ -31,6 +33,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 // Fonction pour s'inscrire
 func Inscription(w http.ResponseWriter, r *http.Request) {
 	if back.Jeu.UtilisateurData.Connect {
+		http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
 		return
 	}
 	//back.Jeu.UtilisateurData = back.UserData
@@ -40,6 +43,7 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 // Fonction treatment pour se connecter
 func InitLogin(w http.ResponseWriter, r *http.Request) {
 	if back.Jeu.UtilisateurData.Connect {
+		http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
 		return
 	}
 
@@ -51,6 +55,7 @@ func InitLogin(w http.ResponseWriter, r *http.Request) {
 			if back.User.Mdp == c.Mdp {
 				back.Jeu.UtilisateurData.Connect = true
 				back.Jeu.Utilisateur = c
+				http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
 				return
 			}
 		}
@@ -62,6 +67,7 @@ func InitLogin(w http.ResponseWriter, r *http.Request) {
 // Fonction treatment pour se connecter
 func InitInscription(w http.ResponseWriter, r *http.Request) {
 	if back.Jeu.UtilisateurData.Connect {
+		http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
 		return
 	}
 
@@ -99,11 +105,13 @@ func InitInscription(w http.ResponseWriter, r *http.Request) {
 
 	back.Jeu.UtilisateurData.Connect = true
 	back.Jeu.Utilisateur = back.User
+	http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
 }
 
 // Fonction pour engregistrer une image et retourne son nom
 func InitImg(w http.ResponseWriter, r *http.Request) string {
 	if back.Jeu.UtilisateurData.Connect {
+		http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
 		return ""
 	}
 	//Prend les données ne dépassant cette taille (pout l'image)
@@ -121,4 +129,23 @@ func InitImg(w http.ResponseWriter, r *http.Request) string {
 	io.Copy(f, file) //Met l'image au chemin donnée
 
 	return handler.Filename
+}
+
+func Url(w http.ResponseWriter, r *http.Request) {
+	var link string
+	if r.URL.Query().Get("url") == "before" {
+		link = back.Jeu.UtilisateurData.Navigate.GoBack()
+	} else {
+		link = back.Jeu.UtilisateurData.Navigate.GoForward()
+	}
+	if link != "No more" {
+		if strings.Contains(link, "?") {
+			link += "&url=" + r.URL.Query().Get("url")
+		} else {
+			link += "?url=" + r.URL.Query().Get("url")
+		}
+		http.Redirect(w, r, link, http.StatusMovedPermanently)
+		return
+	}
+	http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
 }

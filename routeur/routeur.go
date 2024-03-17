@@ -2,18 +2,37 @@ package routeur
 
 import (
 	"fmt"
+	"groupietracker/back"
 	ctrl "groupietracker/controller"
+	"groupietracker/temps"
 	"net/http"
 	"os"
 )
 
 func InitServe() {
 
+	http.HandleFunc("/index", ctrl.Index)
+	// http.HandleFunc("/display", ctrl.Display)
+	http.HandleFunc("/detail", ctrl.Detail)
+	http.HandleFunc("/category", ctrl.Category)
+	http.HandleFunc("/search", ctrl.Search)
+	http.HandleFunc("/treatment/favoris", ctrl.InitFav)
+	http.HandleFunc("/suppr", ctrl.Suppr)
+	http.HandleFunc("/favoris", ctrl.Fav)
+	http.HandleFunc("/propos", ctrl.Propos)
+	http.HandleFunc("/play", ctrl.Play)
+	http.HandleFunc("/url", ctrl.Url)
+
 	http.HandleFunc("/login", ctrl.Login)
 	http.HandleFunc("/login/treatment", ctrl.InitLogin)
 	http.HandleFunc("/inscription", ctrl.Inscription)
 	http.HandleFunc("/inscription/treatment", ctrl.InitInscription)
 	http.HandleFunc("/logout", ctrl.Unlog)
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		back.Jeu.UtilisateurData.Navigate.VisitPage(r.URL.String())
+		temps.Temp.ExecuteTemplate(w, "404", back.Jeu)
+	})
 
 	rootDoc, _ := os.Getwd()
 	fileserver := http.FileServer(http.Dir(rootDoc + "/assets"))
