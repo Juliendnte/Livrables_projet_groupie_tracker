@@ -4,10 +4,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Search</title>
+    <link rel="stylesheet" href="../static/css/base.css">
+    <link rel="icon" href="/static/img/spot.png" />
 </head>
 <body>
-    
+    <div class="up">
+        {{template "header" .}}
+        <section class="body-global">
+            <div class="connection-global">
+                <div class="btn">
+                    <a href="/url?url=before"  class="btn-gauche">❮</a>
+                    <a href="/url?url=after" class="btn-droite">❯</a>
+
+                </div>
+                {{if .UtilisateurData.Connect}}
+                {{if eq .Utilisateur.Img "vert"}}
+                <a href="/favoris" class="vert">
+                    <p>{{.Utilisateur.Letter}}</p>
+                </a>
+                {{else}}
+                <img src="/static/img/{{.Utilisateur.Img}}" class="pdp" />
+                {{end}}
+                {{else}}
+                <div class="connextion-btn">
+                    <a href="/inscription" class="sinscrire"> S'incrire </a>
+                    <a href="/login" class="connection"> Se connecter </a>
+                </div>
+                {{end}}
+            </div>
+            <div>
+                
+            </div>
+        </section>
+    </div>
+    {{template "footer" .}}
 </body>
 </html>
 {{end}}

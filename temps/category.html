@@ -4,10 +4,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>category</title>
+    <link rel="stylesheet" href="../static/css/base.css">
+    <link rel="stylesheet" href="../static/css/display.css">
+    <link rel="icon" href="/static/img/logo/spot.png" />
 </head>
 <body>
-    
+    <div class="up">
+        {{template "header" .}}
+        <section class="body-global">
+            <div class="connection-global">
+                <div class="btn">
+                    <a href="/url?url=before"  class="btn-gauche">❮</a>
+                    <a href="/url?url=after" class="btn-droite">❯</a>
+
+                </div>
+                {{if .UtilisateurData.Connect}}
+                {{if eq .Utilisateur.Img "vert"}}
+                <a href="/favoris" class="vert">
+                    <p>{{.Utilisateur.Letter}}</p>
+                </a>
+                {{else}}
+                <img src="/static/img/{{.Utilisateur.Img}}" class="pdp" />
+                {{end}}
+                {{else}}
+                <div class="connextion-btn">
+                    <a href="/inscription" class="sinscrire"> S'incrire </a>
+                    <a href="/login" class="connection"> Se connecter </a>
+                </div>
+                {{end}}
+            </div>
+            <p class="type">{{.Cat}}</p>
+            {{if eq .Cat "album"}}
+            <div class="playlist">
+                {{range .ListAlbums.Albums.Items}}
+                <div class="individual">
+                    {{range .Images}}
+                    <img src="{{.URL}}" alt="cover">
+                    {{break}}
+                    {{end}}
+                    <div class="cover-info album">
+                        <p class="titre">{{.Name}}</p>
+                        <p class="detail">{{range .Artists}}{{.Name}}•{{end}}</p>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+            <div class="pagination">
+                {{ if and (ne .ListAlbums.Albums.Previous "") (ne .ListAlbums.Albums.Previous nil) }}
+                <a href="/category?moveB={{.ListAlbums.Albums.Previous}}&c={{.Cat}}" class="before">précédent</a>
+                {{end}}
+                {{ if and (ne .ListAlbums.Albums.Next "") (ne .ListAlbums.Albums.Next nil) }}
+                <a href="/category?moveA={{.ListAlbums.Albums.Next}}&c={{.Cat}}" class="next">suivant</a>
+                {{end}}
+            </div>
+            {{else if eq .Cat "track"}}
+            <div class="playlist">
+                {{range .ListTracks.Tracks.Items}}
+                <div class="individual">
+                    {{range .Album.Images}}
+                    <img src="{{.URL}}" alt="cover">
+                    {{break}}
+                    {{end}}
+                    <div class="cover-info album">
+                        <p class="titre">{{.Name}}</p>
+                        <p class="detail">{{range .Artists}}{{.Name}}•{{end}}</p>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+            <div class="pagination">
+                {{if and (ne .ListTracks.Tracks.Previous "") (ne .ListTracks.Tracks.Previous nil)}}
+                <a href="/category?moveB={{.ListTracks.Tracks.Previous}}&c={{.Cat}}" class="before">précédent</a>
+                {{end}}
+                {{if and (ne .ListTracks.Tracks.Next "") (ne .ListTracks.Tracks.Next nil)}}
+                <a href="/category?moveA={{.ListTracks.Tracks.Next}}&c={{.Cat}}" class="next">suivant</a>
+                {{end}}
+            </div>
+            {{else if eq .Cat "artist"}}
+            <div class="playlist">
+                {{range .ListArtists.Artists.Items}}
+                <div class="individual">
+                    {{range .Images}}
+                    <img src="{{.URL}}" alt="cover">
+                    {{break}}
+                    {{end}}
+                    <div class="cover-info album">
+                        <p class="titre">{{.Name}}</p>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+            <div class="pagination">
+                {{if and (ne .ListArtists.Artists.Previous "") (ne .ListArtists.Artists.Previous nil) }}
+                <a href="/category?moveB={{.ListArtists.Artists.Previous}}&c={{.Cat}}" class="before">précédent</a>
+                {{end}}
+                {{if and (ne .ListArtists.Artists.Next "") (ne .ListArtists.Artists.Next nil) }}
+                <a href="/category?moveA={{.ListArtists.Artists.Next}}&c={{.Cat}}" class="next">suivant</a>
+                {{end}}
+            </div>
+            {{else if eq .Cat "playlist"}}
+            <div class="playlist">
+                {{range .ListPlaylist.Playlists.Items}}
+                <div class="individual">
+                    {{range .Images}}
+                    <img src="{{.URL}}" alt="cover">
+                    {{break}}
+                    {{end}}
+                    <div class="cover-info album">
+                        <p class="titre">{{.Name}}</p>
+                        <p class="detail">{{.Description}}</p>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+            <div class="pagination">
+                {{if and (ne .ListPlaylist.Playlists.Previous "") (ne .ListPlaylist.Playlists.Previous nil)}}
+                <a href="/category?moveB={{.ListPlaylist.Playlists.Previous}}&c={{.Cat}}" class="before">précédent</a>
+                {{end}}
+                {{if and (ne .ListPlaylist.Playlists.Next "") (ne .ListPlaylist.Playlists.Next nil)}}
+                <a href="/category?moveA={{.ListPlaylist.Playlists.Next}}&c={{.Cat}}" class="next">suivant</a>
+                {{end}}
+            </div>
+            {{end}}
+        </section>
+    </div>
+    {{template "footer" .}}
 </body>
 </html>
 {{end}}
