@@ -1,0 +1,45 @@
+{{define "Login"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <link rel="stylesheet" href="/static/css/log.css">
+    <link rel="icon" href="/static/img/spot.png" />
+
+</head>
+<body>
+    <header>
+        <a href="/index">
+            <img src="/static/img/spotify.png">
+        </a>
+    </header>
+    <section>
+        <div class="header-body">
+            <p>J'ai un compte Spotify</p>
+        </div>
+        <form method="post" action="/login/treatment">
+            <div class="form-group">
+                <label for="Nom" class="form-label">Nom d'utilisateur</label>
+                <input type="text" name="Nom" class="form-input" autofocus required>
+            </div>
+            <div class="form-group">
+                <label for="Mdp" class="form-label">Mot de passe</label>
+                <input type="password" name="Mdp" class="form-input" required>
+            </div>
+
+            <div class="form-send">
+                <button type="submit" class="submit">Se Connecter</button>
+            </div>
+        </form>
+        <div class="footer-body">
+            <p>Vous n'avez pas de compte ? </p>
+            <a href="/inscription">
+                Je n'ai pas Spotify
+            </a>
+        </div>
+    </section>
+</body>
+</html>
+{{end}}

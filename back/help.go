@@ -2,10 +2,14 @@ package back
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -100,4 +104,69 @@ func ReloadApi() {
 	//Le nouveau token est mit dans la variable globale
 	Token = repMap["access_token"].(string)
 	fmt.Println("Bearer ", Token)
+}
+
+// Fonction pour mettre le JSON dans une struct
+func ReadJSON() ([]Client, error) {
+	jsonFile, err := os.ReadFile("JSON/login.json")
+	if err != nil {
+		fmt.Println("-----------------Error reading-----------------", err.Error())
+	}
+
+	var jsonData []Client
+	err = json.Unmarshal(jsonFile, &jsonData)
+	return jsonData, err
+}
+
+// Fonction pour modifié le JSON
+func EditJSON(ModifiedClient []Client) {
+
+	modifiedJSON, errMarshal := json.Marshal(ModifiedClient)
+	if errMarshal != nil {
+		fmt.Println("-----------------Error encodage -----------------", errMarshal.Error())
+		return
+	}
+
+	// Écrire le JSON modifié dans le fichier
+	if err := os.WriteFile("JSON/login.json", modifiedJSON, 0644); err != nil {
+		fmt.Println("-----------------Erreur lors de l'écriture du fichier JSON modifié:-----------------", err)
+	}
+}
+
+// Fonction pour récupèrer le mot de passe crypté
+func MdpCrypt(Mdp string) string {
+	jsonFile, err := os.ReadFile("JSON/login.json") //Récupére les données du JSON
+	if err != nil {
+		fmt.Println("-----------------Error reading MdpCrypt-----------------", err.Error())
+		return err.Error()
+	}
+
+	if err = json.Unmarshal(jsonFile, &LstUser); err != nil {
+		fmt.Println("-----------------Error encodage MdpCrypt-----------------", err.Error())
+		return err.Error()
+	}
+
+	hasher := sha256.New()
+	hasher.Write([]byte(Mdp))
+	hashedPassword := hex.EncodeToString(hasher.Sum(nil))
+	return hashedPassword // mdp crypter
+}
+
+// Fonction pour savoir si l'id existe déjà
+func IdAlreadyExists(nb int) bool {
+	for i := 0; i < len(LstUser); i++ {
+		if LstUser[i].Id == nb {
+			return true
+		}
+	}
+	return false
+}
+
+// Fonction pour générer un Id disponible
+func GenerateID() int {
+	var Id int = rand.Intn(100)
+	if IdAlreadyExists(Id) {
+		return GenerateID()
+	}
+	return Id
 }

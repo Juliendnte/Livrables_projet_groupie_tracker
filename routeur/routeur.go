@@ -2,11 +2,18 @@ package routeur
 
 import (
 	"fmt"
+	ctrl "groupietracker/controller"
 	"net/http"
 	"os"
 )
 
 func InitServe() {
+
+	http.HandleFunc("/login", ctrl.Login)
+	http.HandleFunc("/login/treatment", ctrl.InitLogin)
+	http.HandleFunc("/inscription", ctrl.Inscription)
+	http.HandleFunc("/inscription/treatment", ctrl.InitInscription)
+	http.HandleFunc("/logout", ctrl.Unlog)
 
 	rootDoc, _ := os.Getwd()
 	fileserver := http.FileServer(http.Dir(rootDoc + "/assets"))

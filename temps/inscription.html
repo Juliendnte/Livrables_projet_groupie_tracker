@@ -1,0 +1,44 @@
+{{define "inscription"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link rel="stylesheet" href="/static/css/log.css">
+    <link rel="icon" href="/static/img/spot.png" />
+</head>
+<body>
+    <header>
+        <a href="/index">
+            <img src="/static/img/spotify.png">
+        </a>
+    </header>
+    <section>
+        <div class="header-body">
+            <p>Inscrivez-vous pour commencer à écouter</p>
+        </div>
+        <form method="post" action="/inscription/treatment">
+            <div class="form-group">
+                <label for="Nom" class="form-label">Nom d'utilisateur</label>
+                <input type="text" name="Nom" class="form-input" autofocus required>
+            </div>
+            <div class="form-group">
+                <label for="Mdp" class="form-label">Mot de passe</label>
+                <input type="password" name="Mdp" class="form-input" required>
+            </div>
+
+            <div class="form-send">
+                <input type="submit" class="submit" value="S'inscrire">
+            </div>
+        </form>
+        <div class="footer-body">
+            <p>Vous avez déjà un compte ?</p>
+            <a class="login" href="/login">
+                Connectez-vous ici.
+            </a>
+        </div>
+    </section>
+</body>
+</html>
+{{end}}
