@@ -50,6 +50,94 @@
         </a>
     </div>
 </footer>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOMContentLoaded");
+        const audio = document.getElementById("myAudio");
+
+        var baliseSource = document.querySelector("#myAudio source");
+        var urlAudio = baliseSource.getAttribute("src");       
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('content').style.display = 'flex';
+
+        if (urlAudio != localStorage.getItem("src")) {
+            localStorage.setItem("time", 0);
+            localStorage.setItem("src", urlAudio);
+        }
+
+        const playPauseButton = document.getElementById('play-pause-button');
+        const progressBar = document.getElementById('progress');
+        const currentTimeDisplay = document.getElementById('current-time');
+        const durationDisplay = document.getElementById('duration');
+
+        if (localStorage.getItem("time") != null || localStorage.getItem("time") != "") {
+            audio.currentTime = localStorage.getItem("time");
+        } else {
+            localStorage.setItem("time", 0);
+        }
+
+        if (localStorage.getItem("isAudioPlaying") == "true") {
+            audio.play();
+            audio.currentTime = localStorage.getItem("time");
+            playPauseButton.textContent = "\u23F8";
+        } else if (localStorage.getItem("isAudioPlaying") == null || localStorage.getItem("isAudioPlaying") =="") {
+            audio.play();
+            audio.currentTime = 0;
+            playPauseButton.textContent = "\u23F8";
+            localStorage.setItem("time", 0);
+            localStorage.setItem("isAudioPlaying", "true");
+        } else {
+            audio.pause();
+            playPauseButton.textContent = "\u25ba";
+        }
+
+        playPauseButton.addEventListener('click', function () {
+            if (localStorage.getItem("isAudioPlaying") == "false") {
+                audio.play();
+                audio.currentTime = localStorage.getItem("time");
+                localStorage.setItem("isAudioPlaying", "true");
+                playPauseButton.textContent = "\u23F8";
+            } else {
+                audio.pause();
+                localStorage.setItem("isAudioPlaying", "false");
+                playPauseButton.textContent = "\u25ba";
+            }
+
+        });
+        audio.addEventListener('timeupdate', function () {
+            localStorage.setItem("time", audio.currentTime);
+            const currentTime = audio.currentTime;
+            const duration = audio.duration;
+
+            currentTimeDisplay.textContent = formatTime(currentTime);
+            durationDisplay.textContent = formatTime(duration);
+
+            const progress = (currentTime / duration) * 100;
+            progressBar.style.width = progress + '%';
+        });
+
+        function formatTime(time) {
+            const minutes = Math.floor(time / 60);
+            const seconds = Math.floor(time % 60);
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+    });
+
+    document.addEventListener("readystatechange", function (event) {
+        if (document.readyState === "loading") {
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+        } else if (document.readyState === "complete") {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('content').style.display = 'flex';
+        }
+    });
+
+    window.addEventListener("beforeunload", function (event) {
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('content').style.display = 'none';
+    });
+</script>
 {{end}}
 <!-- <svg viewBox="0 0 16 16" class="play">
     <path
