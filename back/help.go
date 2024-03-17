@@ -11,9 +11,14 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	ytb "github.com/kkdai/youtube/v2"
+	"google.golang.org/api/googleapi/transport"
+	"google.golang.org/api/youtube/v3"
 )
 
 var Token string
+var apiKeyYtb = "AIzaSyDf8EHLWiDh1mxWHpzhgEu-7FWK5VZESNg"
 var Err error
 
 // Demande a l'api son corps sous un format JSON et le met dans une structure
@@ -169,4 +174,93 @@ func GenerateID() int {
 		return GenerateID()
 	}
 	return Id
+}
+
+// Téléchargement d'une vidéo ytb
+func Download(videoID string) (string, error) {
+	client := ytb.Client{}
+
+	video, err := client.GetVideo(videoID)
+	if err != nil {
+		fmt.Println("Error getting video ", err)
+		return "", err
+	}
+
+	stream, _, err := client.GetStream(video, &video.Formats.WithAudioChannels()[0])
+	if err != nil {
+		fmt.Println("Error getting stream ", err)
+		return "", err
+	}
+	defer stream.Close()
+
+	file, err := os.Create("./assets/vid/" + videoID + ".mp3")
+	if err != nil {
+		fmt.Println("Error creating .mp4 at .assets/vid/ ", err)
+		return "", err
+	}
+	defer file.Close()
+
+	if _, err = io.Copy(file, stream); err != nil {
+		fmt.Println("Error putting stream at file ", err)
+		return "", err
+	}
+
+	return videoID, nil
+}
+
+// Retourne le nombre de like d'une vidéo sur ytb
+func Like(searchTerm string) int {
+	client := &http.Client{
+		Transport: &transport.APIKey{Key: apiKeyYtb},
+	}
+
+	service, err := youtube.New(client)
+	if err != nil {
+		fmt.Printf("Erreur lors de la création du client YouTube : %v\n", err)
+		return 0
+	}
+
+	searchResponse, err := service.Search.List([]string{"id", "snippet"}).Q(searchTerm).Type("video").MaxResults(1).Do()
+	if err != nil {
+		fmt.Printf("Erreur lors de la recherche de vidéos : %v\n", err)
+		return 0
+	}
+
+	if len(searchResponse.Items) == 0 {
+		fmt.Printf("Aucune vidéo trouvée pour le terme de recherche : %s\n", searchTerm)
+		return 0
+	}
+
+	if videoStatsResponse, err := service.Videos.List([]string{"statistics"}).Id(searchResponse.Items[0].Id.VideoId).Do(); err != nil {
+		fmt.Printf("Erreur lors de la récupération des statistiques de la vidéo : %v\n", err)
+		return 0
+	} else {
+		return int(videoStatsResponse.Items[0].Statistics.LikeCount)
+	}
+}
+
+// Retourne l'id d'une vidéo sur ytb
+func IdYtb(search string) string {
+	client := &http.Client{
+		Transport: &transport.APIKey{Key: apiKeyYtb},
+	}
+
+	service, err := youtube.New(client)
+	if err != nil {
+		fmt.Printf("Erreur lors de la création du client YouTube : %v", err)
+		return "dQw4w9WgXcQ" //Rick Roll
+	}
+
+	searchResponse, err := service.Search.List([]string{"id", "snippet"}).Q(search).Type("video").MaxResults(1).Do()
+	if err != nil {
+		fmt.Printf("Erreur lors de la recherche de vidéos : %v", err)
+		return "dQw4w9WgXcQ"
+	}
+
+	if len(searchResponse.Items) == 0 {
+		fmt.Printf("Aucune vidéo trouvée pour le terme de recherche : %s", search)
+		return "dQw4w9WgXcQ"
+	}
+
+	return searchResponse.Items[0].Id.VideoId
 }
