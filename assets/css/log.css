@@ -1,0 +1,142 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Spotify';
+}
+
+@font-face {
+    font-family: 'Spotify';
+    src: url('../fonts/Gotham-Black.otf');
+}
+
+:root {
+    --gray: #121212;
+    --gray-light: #575555;
+    --white: #fff;
+    --black: #000;
+}
+
+body {
+    background: linear-gradient(#2A2A2A, var(--black)) ;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+header {
+    width: 100vw;
+    height: 110px;
+    background-color: var(--black);
+    padding-left: 40px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+    
+}
+
+header a img {
+    width: 120px;
+}
+
+section {
+    background-color: #121212;
+    border-radius: 10px;
+    max-width: 734px;
+    width: 100%;
+    height: 65vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 60px;
+    padding-bottom: 20px;
+}
+
+
+.header-body p {
+    color: var(--white);
+    font-size: 2rem;
+    width: 100%;
+}
+
+form{ 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.form-label{
+    color: var(--white);
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 13px;
+}
+
+.form-group input{
+    margin-bottom: 18px;
+    background-color: var(--black);
+    border: 0px;
+    border-radius: 4px;
+    height: 30px;
+    font-size: 1rem;
+    color: var(--white);
+    padding-left: 14px; 
+    box-shadow: inset 0 0 0 1px var(--white,#000000);
+    background-image: none;
+    transition: box-shadow 0.1s ease-in-out 0s, color 0.1s ease-in-out 0s;
+    inline-size: 100%;
+    min-width: 48px;
+    background-color: var(--gray,#ffffff);
+    box-shadow: inset 0 0 0 1px #727272;
+}
+
+.form-send{
+      width: 90%;
+    margin-top: 40px;
+}
+
+.submit{
+    background-color: #1fdf64;
+    width: 300px;
+    padding: 8px 32px;    
+    border-radius: 500px;
+    min-width: 48px;
+    color: var(--black);
+    border: none;
+}
+
+.footer-body{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 60%;
+}
+
+.footer-body p {
+    color: #a7a7a7;
+    font-size: 1rem;
+}
+
+.footer-body a {
+    color: var(--white);
+    font-size: 1rem;
+}
+
+.unlog{
+    color: var(--white);
+    font-size: 3em;
+}
+
+.index{
+    text-decoration: none;
+    color: var(--black);
+    font-size: 2em;       
+}
