@@ -1,0 +1,58 @@
+{{define "footer"}}
+<div id="loader">
+    <div class="loader-content">
+        <div class="loader-spinner"></div>
+    </div>
+</div>
+<footer>
+    {{if .UtilisateurData.Play}}
+    <div class="footer-music">
+        {{range .Footer.Album.Images}}
+        <img class="foopho" src="{{.URL}}" alt="photo album">
+        {{break}}
+        {{end}}
+        <div class="footer-info">
+
+            <p class="footer-titre">{{.Footer.Name}}</p>
+            <p class="footer-feat">{{range .Footer.Artists}}{{.Name}}{{end}}</p>
+        </div>
+    </div>
+    <div class="audio-player">
+        <audio id="myAudio" autoplay>
+            <source src="/static/vid/{{.Footer.IDYtb}}.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <div class="audio-controls">
+            <button id="play-pause-button">&#9658;</button>
+            <div class="tm">
+                <div id="time-display">
+                    <span id="current-time">00:00</span>
+                </div>
+                <div id="progress-bar">
+                    <div id="progress"></div>
+                </div>
+                <div id="time-display">
+                    <span id="duration">00:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{else}}
+    <div class="footer-vide"></div>
+    <img class="img" src="/static/img/spotify.png">
+    {{end}}
+    <div class="footer-doc">
+        <a href="https://developer.spotify.com/documentation/web-api">
+            Collection Api
+        </a>
+        <a href="/propos">
+            A Propos
+        </a>
+    </div>
+</footer>
+{{end}}
+<!-- <svg viewBox="0 0 16 16" class="play">
+    <path
+    d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z">
+</path>
+</svg> -->

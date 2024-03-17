@@ -1,0 +1,52 @@
+{{define "header"}}
+<header class="nav-collection">
+    <div class="nav-global">
+        <a class="href nav-acceuil" href="/index">
+            <img src="/static/img/home.png" class="home-outline" />
+            <p>Accueil</p>
+        </a>
+        <div class="nav-recherche">
+            <img src="/static/img/search.png" class="search-outline" />
+            <p>Recherche</p>
+        </div>
+    </div>
+    <div class="collection-global">
+        <a href="/display" class="collection-titre">
+            <img src="/static/img/collection.png" class="albums-outline" />
+            <p>Collection</p>
+        </a>
+        <div class="carroussel-global">
+            <a href="/category?c=album">Albums</a>
+            <a href="/category?c=track">Track</a>
+            <a href="/category?c=playlist">Playlists</a>
+            <a href="/category?c=artist">Artistes</a>
+        </div>
+        <div class="tarck-global">
+            <!-- faire en sorte que lorque l'on est connecté c'est les favoris -->
+            {{range .Header.Albums.Items}}
+            <a href="/detail?href={{.Href}}&type={{.Type}}" class="track">
+                <div class="img-track">
+                    {{range .Images}} {{if eq .Width 640}}
+                    <img src="{{.URL}}" alt="" height="100%" />
+                    {{break}} {{end}} {{end}}
+                </div>
+                <div class="info-global">
+                    <div class="info-titre">
+                        <p><strong>{{.Name}}</strong></p>
+                    </div>
+                    <div class="info-artist">
+                        {{range .Artists}}
+                        <p>{{.Name}}</p>
+                         {{end}}
+                    </div>
+                    <div class="info-date">
+                        <p>{{.ReleaseDate}}</p>
+                    </div>
+                </div>
+            </a>
+            {{end}}
+        </div>
+    </div>
+</header>
+
+{{end}}
