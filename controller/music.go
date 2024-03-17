@@ -9,6 +9,8 @@ import (
 	"strconv"
 )
 
+var limit = 12
+
 func Header(w http.ResponseWriter) bool {
 	if back.Jeu.Header.Albums.Href == "" {
 		if back.Body, back.Fail = back.RequestApi("https://api.spotify.com/v1/browse/new-releases?limit=5"); back.Fail.Error.Status != 200 {

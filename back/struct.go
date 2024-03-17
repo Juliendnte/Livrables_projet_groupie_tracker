@@ -429,6 +429,7 @@ type TrackPrecision struct {
 }
 
 type ClientData struct {
+	Navigate *Navigator
 	Connect  bool
 	Play     bool
 }
@@ -461,6 +462,7 @@ type Duree struct {
 
 var Body []byte
 var Fail ErreurApi
+var Navigate = NewNavigator()
 
 var TracksAll Track
 var AlbumAll Albums
