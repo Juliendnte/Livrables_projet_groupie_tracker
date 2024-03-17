@@ -1,0 +1,75 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --gray: #121212;
+    --gray-light: #575555;
+    --white: #fff;
+    --black: #000;
+}
+
+
+
+
+.bonjour {
+    color: var(--white);
+    font-size: 50px;
+}
+
+.over{
+    overflow-y: auto;
+    width: 98%;
+    max-height: 90%;
+}
+
+.playlist {
+    margin-top: 6%;
+    max-height: 60%;
+    width: 98%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 55px;
+}
+
+.img-playlist{
+    width: 170px;
+}
+
+.img-playlist img {
+    height: 170px;
+    width: 170px;
+}
+
+.playlist-global {
+    display: flex;
+    flex-direction: column;
+    width: 170px;
+    height: 300px;
+    overflow: hidden;
+}
+
+.playlist-titre {
+    color: var(--white);
+    max-height: 100px;
+    overflow: hidden;
+}
+
+.info-artist-playlist {
+    color: var(--gray-light);
+}
+
+.playlist::-webkit-scrollbar {
+    width: 12px;
+}
+
+.playlist::-webkit-scrollbar-track {
+    background-color: var(--gray);
+}
+
+.playlist::-webkit-scrollbar-thumb {
+    background-color: var(--gray-light);
+    border-radius: 6px;
+}

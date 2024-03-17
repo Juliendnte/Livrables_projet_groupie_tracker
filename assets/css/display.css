@@ -1,0 +1,118 @@
+:root {
+    --gray: #121212;
+    --gray-light: #575555;
+    --white: #fff;
+    --black: #000;
+}
+
+.playlist{
+    overflow: scroll;
+}
+
+.head img {
+    height: 200px;
+}
+
+.head {
+    display: flex;
+}
+
+.cover-info-album {
+    padding-left: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.type,
+.detail {
+    font-size: 15px;
+}
+
+.titre {
+    font-size: 2.5rem;
+    width: 100%;
+    min-width: 465px;
+}
+
+.titre,
+.type,
+.detail {
+    color: #fff;
+}
+
+.btns{
+    width: 100%;
+    height: 75px;
+    display: flex;
+    align-items: center;
+}
+
+.play{
+    color: black;    
+    width: 58px;
+    height: 58px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1ed760;
+    border-radius: 50%;
+    margin-right: 24px;
+}
+
+.lik{
+     display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+}
+
+.like{
+  width: 23px;
+    height: 23px;
+    cursor: pointer;
+}
+
+.hashtitre{
+    display: flex;
+    width: 15%;
+    justify-content: space-between;}
+
+.header-lst{
+    display: flex;
+    width: 100%;
+    height: 30px;
+    justify-content: space-between;
+    border-bottom: 1px solid transparent;  
+    margin-bottom: 5px;
+}
+
+.horloge{
+    width: 32px;
+}
+
+.song{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.songs{
+    height: 175px;
+    width: 100%;
+}
+
+.info_song a{
+    color: var(--white);
+    width: 240px;
+    display: block;
+    overflow: hidden;
+}
+
+.feat,
+.tmp,
+.header-lst{
+    color: var(--gray-light);
+}
