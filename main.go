@@ -7,6 +7,6 @@ import
 )
 
 func main(){
-    temps.InitTemplate()
-    routeur.InitServe()
+    temps.InitTemplate()//Initialisation des templates
+    routeur.InitServe()//Initialisation des routes / lancement du serveur 
 }
