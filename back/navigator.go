@@ -18,15 +18,17 @@ func NewNavigator() *Navigator {
 
 //Visiter une page
 func (nav *Navigator) VisitPage(page string) {
-	if nav.Index < len(nav.History)-1 {
-		nav.History = nav.History[:nav.Index+1]
+	if page != "/favicon.ico" {
+		if nav.Index < len(nav.History)-1 {
+			nav.History = nav.History[:nav.Index+1]
+		}
+		nav.History = append(nav.History, page)
+		fmt.Println("L'utilisateur a visité ", page)
+		nav.Index++
 	}
-	nav.History = append(nav.History, page)
-	fmt.Println("L'utilisateur a visité ", page)
-	nav.Index++
 }
 
-//Retour sur une ancienne page 
+//Retour sur une ancienne page
 func (nav *Navigator) GoBack() string {
 	if nav.Index <= 0 {
 		return "No more"
