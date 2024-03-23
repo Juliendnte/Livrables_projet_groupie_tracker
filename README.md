@@ -1,5 +1,4 @@
 # Livrables_projet_groupie_tracker
-# Gestion de Ressources Musicales
 
 Ce dépôt contient une solution de gestion de ressources musicales, offrant diverses fonctionnalités telles que la recherche, la consultation de détails, la gestion de favoris et bien plus encore. Ce guide vous aidera à démarrer avec la solution et vous fournira une liste détaillée des routes disponibles.
 
