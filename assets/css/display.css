@@ -1,16 +1,10 @@
-:root {
-    --gray: #121212;
-    --gray-light: #575555;
-    --white: #fff;
-    --black: #000;
-}
-
 .playlist{
     overflow: scroll;
 }
 
 .head img {
     height: 200px;
+    width: 200px;
 }
 
 .head {
@@ -38,7 +32,8 @@
 
 .titre,
 .type,
-.detail {
+.detail ,
+.follower{
     color: #fff;
 }
 
@@ -59,6 +54,8 @@
     background-color: #1ed760;
     border-radius: 50%;
     margin-right: 24px;
+    font-size: 25px;
+    line-height: 25px;
 }
 
 .lik{
@@ -77,8 +74,7 @@
 
 .hashtitre{
     display: flex;
-    width: 15%;
-    justify-content: space-between;}
+}
 
 .header-lst{
     display: flex;
@@ -91,6 +87,8 @@
 
 .horloge{
     width: 32px;
+    height: 32px;
+    margin-right: 36px;
 }
 
 .song{
@@ -100,7 +98,7 @@
 }
 
 .songs{
-    height: 175px;
+    height: 160px;
     width: 100%;
 }
 
@@ -113,6 +111,81 @@
 
 .feat,
 .tmp,
-.header-lst{
+.header-lst,
+.like-artist{
     color: var(--gray-light);
+}
+
+ol {
+    counter-reset: listCounter;
+  }
+
+  .info_song {
+    counter-increment: listCounter;
+    display: flex;
+  }
+
+  .info_song::before {
+    content: counter(listCounter);
+    color: var(--gray-light);
+  }
+
+  .TIRE{
+    margin-left: 50px;
+  }
+
+  .lis{
+    margin-left: 50px;
+  }
+
+.tmp{
+    margin-right: 36px;
+}
+
+.song-artist{
+    display: flex;
+    width: 100%;
+    height: 30%;
+    justify-content: space-between;
+}
+
+.info_song-artist{
+    width: 50%;
+    overflow: hidden;
+}
+
+.lis-artist{
+    display: flex;
+    /*! color: var(--white); */
+}
+
+.lis-artist >img{
+    width: 40px;
+}
+
+.pdp-album >img{
+    width: 150px;
+}
+
+.songs-album{
+    display: flex;
+    overflow-x: scroll;
+}
+
+.header-lst-artist{
+    margin-bottom: 30px;
+    color: var(--white);
+    font-size: 23px;
+}
+
+.album-individual{
+    padding-right: 40px;
+}
+
+.listalbums{
+    margin-top: 100px;
+}
+
+.a-artist{
+    color: var(--white);
 }

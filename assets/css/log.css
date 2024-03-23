@@ -140,3 +140,64 @@ form{
     color: var(--black);
     font-size: 2em;       
 }
+
+.vert{
+    background-color: #1fdf64;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vert, .pdp-fav{
+    width: 60px;
+    height: 60px;
+    color: white;
+    text-decoration: none;
+}
+
+.fav-head{
+    width: 100vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-fav{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column
+}
+
+.input-img{
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    border-radius: 50%;
+    cursor: pointer;
+    background: transparent;
+}
+
+.input-img:hover {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 100;
+    background-image: url(../img/camera.png);
+    background-repeat: no-repeat;
+    background-size: 40px;
+    background-position: center;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.input-img::before{
+    display:none !important;
+}
+
+.deco{
+    color: white;
+    text-decoration: none;
+}

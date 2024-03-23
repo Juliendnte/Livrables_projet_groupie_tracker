@@ -12,9 +12,10 @@
 :root {
     --gray: #121212;
     --gray-light: #575555;
+    --gray-cool: #a7a7a7;
     --white: #fff;
     --black: #000;
-}
+  }
 
 body {
     background-color: var(--black);
@@ -39,6 +40,7 @@ body {
     flex-direction: column;
     padding-left: 50px;
     margin-right: 25px;
+    min-width: 700px;
 }
 
 .nav-collection {
@@ -48,10 +50,16 @@ body {
     flex-direction: column;
     justify-content: flex-end;
     
+    min-width: 240px;
 }
 
 a{
     text-decoration: none
+}
+a:hover{
+    text-decoration: underline;
+    text-decoration-color: var(--white);
+    cursor: pointer;
 }
 
 .nav-global {
@@ -65,6 +73,8 @@ a{
     margin-left: 24px;
     height: 30%;
     overflow: hidden;
+    min-height: 50px;
+    max-height: 100px;
 }
 
 .href {
@@ -98,8 +108,9 @@ a{
     background-color: var(--gray);
     padding: 5px;
     width: 85%;
-    height: 70%;
+    height: 60vh;
     border-radius: 20px;
+    max-height: 420px;
 }
 
 .collection-titre {
@@ -142,7 +153,7 @@ a{
     height: 50%;
 }
 
-.track {
+.header-track {
     width: 70%;
     max-height: 70px;
     display: flex;
@@ -153,7 +164,7 @@ a{
     width: 7px;
 }
 
-.tarck-global::-webkit-scrollbar-track{
+.tarck-global::-webkit-scrollbar-header-track{
     background-color: var(--gray);
 }
 
@@ -236,6 +247,7 @@ button {
     align-items: center;
     justify-content: center;
     margin-bottom: 19px;
+    padding-bottom: 5px;
 }
 
 #progress-bar {
@@ -244,6 +256,10 @@ button {
     width: 50vw;
     margin: 0 10px;
     position: relative;
+}
+
+#progress:hover{
+    background-color: #1fdf64;
 }
 
 #progress {
@@ -314,6 +330,7 @@ footer img {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    min-width: 700px;
 }
 
 .btn {

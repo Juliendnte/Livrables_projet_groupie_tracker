@@ -1,0 +1,236 @@
+.button-filtre{
+    background-color: var(--gray-cool);
+    width: 50px;
+    padding: 20px;
+    border-radius: 35px;
+  }
+  
+  .header-input{
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+    align-items: center;
+  }
+  
+  .group {
+    display: flex;
+    line-height: 28px;
+    align-items: center;
+    position: relative;
+    max-width: 590px;
+  }
+  
+  .input {
+    height: 40px;
+    line-height: 28px;
+    padding: 0 1rem;
+    width: 490px;
+    padding-left: 2.5rem;
+    outline: none;
+    background: linear-gradient(180deg,     rgb(56, 56, 56) 0%, rgb(36, 36, 36)   66%, rgb(41, 41, 41) 100%);
+    color: #fff;
+    transition: .3s ease;
+    border: 2px solid;
+    border-radius:35px;
+  }
+  
+  .input::placeholder {
+    color: #fff;
+  }
+  
+  .input:focus::placeholder {
+    color: #999;
+  }
+  
+  .icon {
+    position: absolute;
+    left: 1rem;
+    fill: #fff;
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  
+  .search form {
+    display: flex;
+  }
+  
+  .filtre form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 225px;
+    font-size: 8px;
+    color: white;
+    height: 83%;
+  }
+  
+  .filtre{
+    justify-content: center;
+    display: none;
+    height: 55%;
+    position: absolute;
+    left: 74%;
+    top: 10%;
+  }
+  
+  .filtre-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: rgb(87, 85, 85,0.9);
+    border-radius: 15px;
+  }
+  
+  .follower-global,
+  .genres-global,
+  .alphaphetique-global {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    height: 19%;
+    width: 100%;
+  }
+  
+  .label{
+    font-size: 15px;
+    color: black;
+    background-color: white;
+    padding: 5px;
+    border-radius: 10px;
+  }
+  
+  .foll {
+    width: 60%;
+    height: 50px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .genres {
+    width: 60%;
+    height: 150px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    overflow-y: auto;
+  }
+  
+  .genre {
+    padding-top: 5px;
+    width: 50%;
+  }
+  
+  .alha-p,
+  .pasalha-p {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .toujours-alha,
+  .toujours-pasalha {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .presque-alha,
+  .presque-pasalha {
+    min-width: 35px;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .alphaphetique,
+  label[for="pasalha"] {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .filtre input[type="submit"]{
+    width: 50%;
+  }
+  
+  .fermer{
+    width: 100%;
+    height: 10%;
+    justify-content: flex-end;
+    display: flex;
+    position: absolute;
+    top: 0;
+  }
+  
+  .main{
+    width: 100%;
+    height: 85%;
+    overflow-y: scroll;
+  }
+  
+  .container{
+    width: 100%;
+    height: 70%;
+  }
+  
+  .container img{
+    width: 180px;
+    height: 180px;
+  }
+  
+  .blaze{
+    color: var(--white); 
+    font-weight: 300;
+    font-size: 15px;
+  }
+  
+  .detail{
+    font-size: 12px;
+    color: var(--gray-cool);
+  }
+  
+  .Nom > p {
+    color: var(--white);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  
+  .artist,
+  .album,
+  .playlist,
+  .track{
+    display: flex;
+    overflow-x: scroll;
+    width: 100%;
+    height: 75%;
+    overflow-y: hidden;
+  }
+  
+  .artist-individual >.pdp >img{
+    border-radius: 50%; 
+  }
+  
+  .artist-individual,
+  .album-individual,
+  .playlist-individual{
+    padding: 10px;
+  }
+  
+  .artist-individual:hover,
+  .album-individual:hover,
+  .playlist-individual:hover{
+    background-color: #191919;
+    border-radius: 5px;
+  }
+  
+  .song{
+    display: flex;
+    justify-content: space-between
+  }
