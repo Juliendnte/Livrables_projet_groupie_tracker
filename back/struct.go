@@ -14,15 +14,23 @@ type Site struct {
 
 	ArtistsDetail  ArtistPrecision
 	AlbumsDetail   AlbumPrecision
-	TracksDetail   TrackPrecision
 	PlaylistDetail PlaylistPrecision
+	TracksDetail   TrackPrecision
 
-	MoveA string
-	MoveB string
-	Cat   string
+	ListArtistsDetail  []ArtistPrecision
+	ListTracksDetail   []TrackPrecision
+	ListPlaylistDetail []PlaylistPrecision
+	ListAlbumsDetail   []AlbumPrecision
+	TrackListAPI       ApiResponseTrack
+	AlbumListAPI       ApiResponseAlbumList
+
+	MoveA      string
+	MoveB      string
+	Cat        string
+	AllGenres  Genre
 }
 
-type Artists struct { 
+type Artists struct {
 	Artists struct {
 		Items []struct {
 			ExternalUrls struct {
@@ -51,11 +59,12 @@ type Artists struct {
 	} `json:"artists"`
 }
 
-type Albums struct { 
+type Albums struct {
 	Albums struct {
 		Href     string `json:"href"`
 		Limit    int    `json:"limit"`
 		Next     string `json:"next"`
+		Total    int    `json:"total"`
 		Offset   int    `json:"offset"`
 		Previous string `json:"previous"`
 		Items    []struct {
@@ -86,7 +95,7 @@ type Albums struct {
 	} `json:"albums"`
 }
 
-type Track struct { 
+type Track struct {
 	Tracks struct {
 		Items []struct {
 			Album struct {
@@ -138,6 +147,8 @@ type Track struct {
 			Popularity int    `json:"popularity"`
 			PreviewURL string `json:"preview_url"`
 			Type       string `json:"type"`
+			Temps      string
+			Like       string
 		} `json:"items"`
 		Limit    int    `json:"limit"`
 		Next     string `json:"next"`
@@ -198,6 +209,7 @@ type AlbumPrecision struct {
 		Width  int    `json:"width"`
 	} `json:"images"`
 	Name        string `json:"name"`
+	Href        string `json:"href"`
 	ReleaseDate string `json:"release_date"`
 	Type        string `json:"type"`
 	Artists     []struct {
@@ -236,6 +248,7 @@ type AlbumPrecision struct {
 			TrackNumber int    `json:"track_number"`
 			Type        string `json:"type"`
 			Temps       string
+			Like        string
 		} `json:"items"`
 	} `json:"tracks"`
 	Copyrights []struct {
@@ -252,7 +265,8 @@ type ArtistPrecision struct {
 		Spotify string `json:"spotify"`
 	} `json:"external_urls"`
 	Followers struct {
-		Total int `json:"total"`
+		Total    int `json:"total"`
+		Totalstr string
 	} `json:"followers"`
 	Genres []string `json:"genres"`
 	ID     string   `json:"id"`
@@ -263,6 +277,7 @@ type ArtistPrecision struct {
 	} `json:"images"`
 	Name       string `json:"name"`
 	Popularity int    `json:"popularity"`
+	Href       string `json:"href"`
 	Type       string `json:"type"`
 }
 
@@ -275,6 +290,7 @@ type PlaylistPrecision struct {
 		Total int `json:"total"`
 	} `json:"followers"`
 	ID     string `json:"id"`
+	Href   string `json:"href"`
 	Images []struct {
 		URL    string `json:"url"`
 		Height int    `json:"height"`
@@ -423,15 +439,54 @@ type TrackPrecision struct {
 	Href        string `json:"href"`
 	TrackNumber int    `json:"track_number"`
 	Type        string `json:"type"`
-	Like        int
+	Like        string
 	IDYtb       string
 	Temps       string
 }
 
+type ApiResponseTrack struct {
+	Tracks []TrackPrecision `json:"tracks"`
+}
+
+type ApiResponseAlbumList struct {
+	Href  string `json:"href"`
+	Items []struct {
+		AlbumGroup string `json:"album_group"`
+		AlbumType  string `json:"album_type"`
+		Artists    []struct {
+			Href string `json:"href"`
+			ID   string `json:"id"`
+			Name string `json:"name"`
+			Type string `json:"type"`
+		} `json:"artists"`
+		Href   string `json:"href"`
+		ID     string `json:"id"`
+		Images []struct {
+			Height int    `json:"height"`
+			URL    string `json:"url"`
+			Width  int    `json:"width"`
+		} `json:"images"`
+		Name        string `json:"name"`
+		ReleaseDate string `json:"release_date"`
+		TotalTracks int    `json:"total_tracks"`
+		Type        string `json:"type"`
+	} `json:"items"`
+	Limit    int         `json:"limit"`
+	Next     string      `json:"next"`
+	Offset   int         `json:"offset"`
+	Previous interface{} `json:"previous"`
+	Total    int         `json:"total"`
+}
+
 type ClientData struct {
-	Navigate *Navigator
-	Connect  bool
-	Play     bool
+	Navigate        *Navigator
+	Connect         bool
+	Play            bool
+	Fav             bool
+	FavorisArtists  []ArtistPrecision
+	FavorisAlbums   []AlbumPrecision
+	FavorisTracks   []TrackPrecision
+	FavorisPlaylist []PlaylistPrecision
 }
 
 type Client struct {
@@ -441,10 +496,20 @@ type Client struct {
 	Img    string `json:"img"`
 	Letter string `json:"letter"`
 
-	FavorisTrack    []TrackPrecision    `json:"favoristrack"`
-	FavorisPlaylist []PlaylistPrecision `json:"favorisplaylist"`
-	FavorisArtist   []ArtistPrecision   `json:"favorisartist"`
-	FavorisAlbum    []AlbumPrecision    `json:"favorisalbum"`
+	FavorisTrack    []string `json:"favoristrack"`
+	FavorisPlaylist []string `json:"favorisplaylist"`
+	FavorisArtist   []string `json:"favorisartist"`
+	FavorisAlbum    []string `json:"favorisalbum"`
+}
+
+type Genre struct {
+	Genres []string `json:"genres"`
+}
+
+type Images struct {
+	Height int    `json:"height"`
+	URL    string `json:"url"`
+	Width  int    `json:"width"`
 }
 
 type ErreurApi struct {
@@ -462,12 +527,6 @@ type Duree struct {
 
 var Body []byte
 var Fail ErreurApi
-var Navigate = NewNavigator()
-
-var TracksAll Track
-var AlbumAll Albums
-var ArtistAll Artists
-var PlaylistsAll Playlist
 
 var Tracks Track
 var Album Albums

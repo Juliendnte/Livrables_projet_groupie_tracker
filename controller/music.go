@@ -10,9 +10,69 @@ import (
 )
 
 var limit = 12
+var search string
 
-func Header(w http.ResponseWriter) bool {
-	if back.Jeu.Header.Albums.Href == "" {
+func Header(w http.ResponseWriter, detail bool) bool {
+	if back.Jeu.UtilisateurData.Fav {
+		if detail {
+			back.Jeu.UtilisateurData.FavorisAlbums = []back.AlbumPrecision{}
+			back.Jeu.UtilisateurData.FavorisArtists = []back.ArtistPrecision{}
+			back.Jeu.UtilisateurData.FavorisPlaylist = []back.PlaylistPrecision{}
+			back.Jeu.UtilisateurData.FavorisTracks = []back.TrackPrecision{}
+
+			if back.LstUser, err = back.ReadJSON(); err != nil {
+				fmt.Println("-----------------Error ID InitFav-----------------", err.Error())
+				InitTemps.Temp.ExecuteTemplate(w, "404", back.Jeu)
+				return false
+			}
+			for _, c := range back.LstUser {
+				if c.Id == back.Jeu.Utilisateur.Id {
+					for _, v := range c.FavorisAlbum {
+						if back.Body, back.Fail = back.RequestApi(v); back.Fail.Error.Status != 200 {
+							fmt.Println("-----------------Erreur :-----------------", back.Fail)
+							InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
+							return false
+						}
+						album := back.AlbumPrecision{}
+						json.Unmarshal(back.Body, &album)
+						back.Jeu.UtilisateurData.FavorisAlbums = append(back.Jeu.UtilisateurData.FavorisAlbums, album)
+					}
+					for _, v := range c.FavorisArtist {
+						if back.Body, back.Fail = back.RequestApi(v); back.Fail.Error.Status != 200 {
+							fmt.Println("-----------------Erreur :-----------------", back.Fail)
+							InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
+							return false
+						}
+						Artist := back.ArtistPrecision{}
+						json.Unmarshal(back.Body, &Artist)
+						back.Jeu.UtilisateurData.FavorisArtists = append(back.Jeu.UtilisateurData.FavorisArtists, Artist)
+					}
+					for _, v := range c.FavorisPlaylist {
+						if back.Body, back.Fail = back.RequestApi(v); back.Fail.Error.Status != 200 {
+							fmt.Println("-----------------Erreur :-----------------", back.Fail)
+							InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
+							return false
+						}
+						Playlist := back.PlaylistPrecision{}
+						json.Unmarshal(back.Body, &Playlist)
+						back.Jeu.UtilisateurData.FavorisPlaylist = append(back.Jeu.UtilisateurData.FavorisPlaylist, Playlist)
+					}
+					for _, v := range c.FavorisTrack {
+						if back.Body, back.Fail = back.RequestApi(v); back.Fail.Error.Status != 200 {
+							fmt.Println("-----------------Erreur :-----------------", back.Fail)
+							InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
+							return false
+						}
+						track := back.TrackPrecision{}
+						json.Unmarshal(back.Body, &track)
+						back.Jeu.UtilisateurData.FavorisTracks = append(back.Jeu.UtilisateurData.FavorisTracks, track)
+					}
+				}
+			}
+			back.Jeu.Header.Albums.Href = ""
+		}
+
+	} else if back.Jeu.Header.Albums.Href == "" {
 		if back.Body, back.Fail = back.RequestApi("https://api.spotify.com/v1/browse/new-releases?limit=5"); back.Fail.Error.Status != 200 {
 			fmt.Println("-----------------Erreur :-----------------", back.Fail)
 			InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
@@ -24,11 +84,10 @@ func Header(w http.ResponseWriter) bool {
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	back.Jeu.UtilisateurData.Navigate = back.Navigate
 	if r.URL.Query().Get("url") == "" {
 		back.Jeu.UtilisateurData.Navigate.VisitPage(r.URL.String())
 	}
-	if !Header(w) {
+	if !Header(w, false) {
 		return
 	}
 
@@ -37,9 +96,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
 		return
 	}
-	json.Unmarshal(back.Body, &back.Playlists)
+	json.Unmarshal(back.Body, &back.Jeu.ListPlaylist)
 
-	back.Jeu.ListPlaylist = back.Playlists
 	InitTemps.Temp.ExecuteTemplate(w, "index", back.Jeu)
 }
 
@@ -47,7 +105,7 @@ func Detail(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Query().Get("url") == "" {
 		back.Jeu.UtilisateurData.Navigate.VisitPage(r.URL.String())
 	}
-	if !Header(w) {
+	if !Header(w, false) {
 		return
 	}
 
@@ -68,11 +126,29 @@ func Detail(w http.ResponseWriter, r *http.Request) {
 		}
 		back.Jeu.PlaylistDetail = back.PlaylistOff
 	case "artist":
-		json.Unmarshal(back.Body, &back.ArtistOff)
-		back.Jeu.ArtistsDetail = back.ArtistOff
+		json.Unmarshal(back.Body, &back.Jeu.ArtistsDetail)
+		back.Jeu.ArtistsDetail.Followers.Totalstr = back.FormatAbo(back.Jeu.ArtistsDetail.Followers.Total)
+		if back.Body, back.Fail = back.RequestApi(Href + "/albums"); back.Fail.Error.Status != 200 {
+			fmt.Println("-----------------Erreur :-----------------", back.Fail)
+			InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
+			return
+		}
+		json.Unmarshal(back.Body, &back.Jeu.AlbumListAPI)
+		if back.Body, back.Fail = back.RequestApi(Href + "/top-tracks?limit=5"); back.Fail.Error.Status != 200 {
+			fmt.Println("-----------------Erreur :-----------------", back.Fail)
+			InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
+			return
+		}
+		json.Unmarshal(back.Body, &back.Jeu.TrackListAPI)
+		if len(back.Jeu.TrackListAPI.Tracks) > 4 {
+			back.Jeu.TrackListAPI.Tracks = back.Jeu.TrackListAPI.Tracks[:5]
+		}
+		for i := 0; i < len(back.Jeu.TrackListAPI.Tracks); i++ {
+			back.Jeu.TrackListAPI.Tracks[i].Temps = back.Tmps(back.Jeu.TrackListAPI.Tracks[i].DurationMs)
+			back.Jeu.TrackListAPI.Tracks[i].Like = back.Like(back.Jeu.TrackListAPI.Tracks[i].Name + " " + back.Jeu.TrackListAPI.Tracks[i].Artists[0].Name)
+		}
 	case "album":
 		json.Unmarshal(back.Body, &back.AlbumOff)
-		back.Jeu.AlbumsDetail = back.AlbumOff
 		milsec := 0
 		for i := 0; i < len(back.Jeu.AlbumsDetail.Tracks.Items); i++ {
 			milsec += back.Jeu.AlbumsDetail.Tracks.Items[i].DurationMs
@@ -80,6 +156,7 @@ func Detail(w http.ResponseWriter, r *http.Request) {
 		}
 		back.Jeu.AlbumsDetail.Temps = back.Tmps(milsec)
 		back.AlbumOff.Temps = back.AlbumOff.TempsAlbum()
+		back.Jeu.AlbumsDetail = back.AlbumOff
 	case "track":
 		json.Unmarshal(back.Body, &back.TrackOff)
 		back.Jeu.TracksDetail = back.TrackOff
@@ -108,7 +185,7 @@ func Category(w http.ResponseWriter, r *http.Request) {
 		back.Jeu.UtilisateurData.Navigate.VisitPage(r.URL.String())
 	}
 
-	if !Header(w) {
+	if !Header(w, false) {
 		return
 	}
 	back.Jeu.Cat = r.URL.Query().Get("c")
@@ -136,28 +213,28 @@ func Category(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(back.Jeu.Cat)
 	switch back.Jeu.Cat {
 	case "playlist":
-		json.Unmarshal(back.Body, &back.Playlists)
+		json.Unmarshal(back.Body, &back.Jeu.ListPlaylist)
 		//back.Playlists.Temps = back.TempsPlaylist(back.Playlists)
-		back.Jeu.ListPlaylist = back.Playlists
 
 	case "artist":
-		json.Unmarshal(back.Body, &back.Artist)
-		back.Jeu.ListArtists = back.Artist
+		json.Unmarshal(back.Body, &back.Jeu.ListArtists)
 
 	case "album":
-		json.Unmarshal(back.Body, &back.Album)
-		back.Jeu.ListAlbums = back.Album
+		json.Unmarshal(back.Body, &back.Jeu.ListAlbums)
 		// for i := 0; i < len(back.Jeu.AlbumsDetail.Tracks.Items); i++ {
 		// 	back.Jeu.AlbumsDetail.Tracks.Items[i].Temps = back.Tmps(back.Jeu.AlbumsDetail.Tracks.Items[i].DurationMs)
 		// }
 		// back.AlbumOff.Temps = back.TempsAlbum(back.AlbumOff)
 
 	case "track":
-		json.Unmarshal(back.Body, &back.Tracks)
-		back.Jeu.ListTracks = back.Tracks
+		json.Unmarshal(back.Body, &back.Jeu.ListTracks)
 
 	default:
-		http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
+		if len(back.Jeu.UtilisateurData.Navigate.History) > 0 {
+			http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
+		} else {
+			http.Redirect(w, r, "/index", http.StatusMovedPermanently)
+		}
 		return
 	}
 	InitTemps.Temp.ExecuteTemplate(w, "category", back.Jeu)
@@ -167,36 +244,70 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Query().Get("url") == "" {
 		back.Jeu.UtilisateurData.Navigate.VisitPage(r.URL.String())
 	}
-	var Max int = 100
 	var Follow int
 	var aime int
-	if !Header(w) {
+	back.Jeu.ListAlbums = back.Album
+	back.Jeu.ListArtists = back.Artist
+	back.Jeu.ListPlaylist = back.Playlists
+	back.Jeu.ListTracks = back.Tracks
+
+	if !Header(w, false) {
 		return
 	}
-	for nb := 0; nb < Max; nb++ {
-		if back.Body, back.Fail = back.RequestApi("https://api.spotify.com/v1/search?q=%2525" + r.URL.Query().Get("search") + "%2525&type=track%2Calbum%2Cartist%2Cplaylist&offset=0&limit=" + strconv.Itoa(Max)); back.Fail.Error.Status != 200 {
-			if back.Fail.Error.Message == "Invalid limit" {
-				Max--
-				continue
-			}
-			fmt.Println("-----------------Erreur reading requestApi 3 Search :-----------------", back.Fail)
+
+	if len(back.Jeu.AllGenres.Genres) < 1 {
+		if back.Body, back.Fail = back.RequestApi("https://api.spotify.com/v1/recommendations/available-genre-seeds"); back.Fail.Error.Status != 200 {
+			fmt.Println("-----------------Erreur reading requestApi 2 category :-----------------", back.Fail)
 			InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
 			return
 		}
+		json.Unmarshal(back.Body, &back.Jeu.AllGenres)
 	}
-	if Follow, err = strconv.Atoi(r.FormValue("f")); err != nil || Follow < 0 {
-		fmt.Println("-----------------Erreur Atoi Search :-----------------", err)
+	var strFollow string
+	fmt.Println(search)
+	if r.URL.Query().Get("search") != "" {
+		search = r.URL.Query().Get("search")
+	} else if search == "" {
 		InitTemps.Temp.ExecuteTemplate(w, "search", back.Jeu)
 		return
 	}
-	Follow=0
-	r.ParseForm()
-	Genre := r.Form["g"]
+
+	if back.Body, back.Fail = back.RequestApi("https://api.spotify.com/v1/search?q=" + search + "&type=track%2Calbum%2Cartist%2Cplaylist&offset=0&limit=10"); back.Fail.Error.Status != 200 {
+		fmt.Println("-----------------Erreur reading requestApi 3 Search :-----------------", back.Fail)
+		InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
+		return
+	}
+
 	json.Unmarshal(back.Body, &back.Jeu.ListAlbums)
 	json.Unmarshal(back.Body, &back.Jeu.ListArtists)
-	json.Unmarshal(back.Body, &back.Jeu.ListTracks)
+	for i, c := range back.Jeu.ListArtists.Artists.Items {
+		if len(c.Images) == 0 {
+			back.Jeu.ListArtists.Artists.Items[i].Images = append(back.Jeu.ListArtists.Artists.Items[i].Images, back.Images{URL: "/static/img/nopdp.png"})
+		}
+	}
+
 	json.Unmarshal(back.Body, &back.Jeu.ListPlaylist)
+	json.Unmarshal(back.Body, &back.Jeu.ListTracks)
+
+	if strFollow = r.FormValue("follower"); strFollow != "" {
+		if Follow, err = strconv.Atoi(strFollow); err != nil || Follow < 0 {
+			fmt.Println("-----------------Erreur Atoi Search :-----------------", err)
+			if len(back.Jeu.UtilisateurData.Navigate.History) > 0 {
+				http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
+			} else {
+				http.Redirect(w, r, "/index", http.StatusMovedPermanently)
+			}
+		}
+	} else {
+		fmt.Println("0")
+		Follow = 0
+	}
+
+	r.ParseForm()
+	Genre := r.Form["genre"]
+	fmt.Println(Genre)
 	if Follow > 0 {
+		fmt.Println(Follow)
 		for i, c := range back.Jeu.ListPlaylist.Playlists.Items {
 			if back.Body, back.Fail = back.RequestApi(c.Href); back.Fail.Error.Status != 200 {
 				fmt.Println("-----------------Erreur reading requestApi Playlist :-----------------", back.Fail)
@@ -204,8 +315,18 @@ func Search(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			json.Unmarshal(back.Body, &back.PlaylistOff)
+			fmt.Println("La playlist :", back.PlaylistOff.Name, " a", back.PlaylistOff.Followers.Total)
+			fmt.Println("Il faut ", Follow, "d'abonné")
+			fmt.Printf("\n\n")
+
 			if back.PlaylistOff.Followers.Total < Follow {
-				back.Jeu.ListPlaylist.Playlists.Items = append(back.Jeu.ListPlaylist.Playlists.Items[:i], back.Jeu.ListPlaylist.Playlists.Items[i+1:]...)
+				if i >= len(back.Jeu.ListPlaylist.Playlists.Items)-1 {
+					back.Jeu.ListPlaylist.Playlists.Items = back.Jeu.ListPlaylist.Playlists.Items[:len(back.Jeu.ListPlaylist.Playlists.Items)-1]
+				} else {
+					back.Jeu.ListPlaylist.Playlists.Items = append(back.Jeu.ListPlaylist.Playlists.Items[:i], back.Jeu.ListPlaylist.Playlists.Items[i+1:]...)
+				}
+			} else {
+				fmt.Println("Assez de followers ", back.PlaylistOff.Followers.Total, " pour ", back.PlaylistOff.Name)
 			}
 		}
 		for i, c := range back.Jeu.ListAlbums.Albums.Items { //Filtre nul pour lui peut être voir sur une autre platforme pour récupérer les likes d'une albums
@@ -215,8 +336,18 @@ func Search(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			json.Unmarshal(back.Body, &back.ArtistOff)
+			fmt.Println("L' artist :", back.ArtistOff.Name, " a", back.ArtistOff.Followers.Total)
+			fmt.Println("Il faut ", Follow, "d'abonné")
+			fmt.Printf("\n\n")
+
 			if back.ArtistOff.Followers.Total < Follow {
-				back.Jeu.ListAlbums.Albums.Items = append(back.Jeu.ListAlbums.Albums.Items[:i], back.Jeu.ListAlbums.Albums.Items[i+1:]...)
+				if i >= len(back.Jeu.ListAlbums.Albums.Items)-1 {
+					back.Jeu.ListAlbums.Albums.Items = back.Jeu.ListAlbums.Albums.Items[:len(back.Jeu.ListAlbums.Albums.Items)-1]
+				} else {
+					back.Jeu.ListAlbums.Albums.Items = append(back.Jeu.ListAlbums.Albums.Items[:i], back.Jeu.ListAlbums.Albums.Items[i+1:]...)
+				}
+			} else {
+				fmt.Println("Assez de followers ", back.ArtistOff.Followers.Total, " pour ", back.ArtistOff.Name)
 			}
 		}
 		for i, c := range back.Jeu.ListArtists.Artists.Items {
@@ -226,18 +357,41 @@ func Search(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			json.Unmarshal(back.Body, &back.ArtistOff)
+			fmt.Println("L'artist :", back.ArtistOff.Name, " a", back.ArtistOff.Followers.Total)
+			fmt.Println("Il faut ", Follow, "d'abonné")
+			fmt.Printf("\n\n")
+
 			if back.ArtistOff.Followers.Total < Follow {
-				back.Jeu.ListArtists.Artists.Items = append(back.Jeu.ListArtists.Artists.Items[:i], back.Jeu.ListArtists.Artists.Items[i+1:]...)
+				if i >= len(back.Jeu.ListArtists.Artists.Items)-1 {
+					back.Jeu.ListArtists.Artists.Items = back.Jeu.ListArtists.Artists.Items[:len(back.Jeu.ListArtists.Artists.Items)-1]
+				} else {
+					back.Jeu.ListArtists.Artists.Items = append(back.Jeu.ListArtists.Artists.Items[:i], back.Jeu.ListArtists.Artists.Items[i+1:]...)
+				}
+			} else {
+				fmt.Println("Assez de followers ", back.ArtistOff.Followers.Total, " pour ", back.ArtistOff.Name)
 			}
 		}
 		for i, c := range back.Jeu.ListTracks.Tracks.Items {
-			if aime = back.Like(c.Name + c.Artists[0].Name); aime < Follow {
-				back.Jeu.ListTracks.Tracks.Items = append(back.Jeu.ListTracks.Tracks.Items[:i], back.Jeu.ListTracks.Tracks.Items[i+1:]...)
+			if len(c.Artists) > 0 {
+				if aime, _ = strconv.Atoi(back.Like(c.Name + " " + c.Artists[0].Name)); aime < Follow {
+					fmt.Println("Le son :", c.Name, " a", aime)
+					fmt.Println("Il faut ", Follow, "d'abonné")
+					fmt.Printf("\n\n")
+					if i >= len(back.Jeu.ListTracks.Tracks.Items)-1 {
+						back.Jeu.ListTracks.Tracks.Items = back.Jeu.ListTracks.Tracks.Items[:len(back.Jeu.ListTracks.Tracks.Items)-1]
+					} else {
+						back.Jeu.ListTracks.Tracks.Items = append(back.Jeu.ListTracks.Tracks.Items[:i], back.Jeu.ListTracks.Tracks.Items[i+1:]...)
+					}
+				} else {
+					fmt.Println("Assez de followers ", aime, " pour ", c.Artists[0].Name)
+				}
+			} else {
+				fmt.Println(c.Name)
 			}
-
 		}
 	}
 	if len(Genre) > 0 {
+		fmt.Println(Genre)
 		for i, c := range back.Jeu.ListPlaylist.Playlists.Items {
 			if back.Body, back.Fail = back.RequestApi(c.Href); back.Fail.Error.Status != 200 {
 				fmt.Println("-----------------Erreur reading requestApi 2 Playlist :-----------------", back.Fail)
@@ -281,72 +435,17 @@ func Search(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	fmt.Println(r.FormValue("alpha"))
 	if r.FormValue("alpha") == "ok" {
 		back.Jeu.ListPlaylist.InsertionSortPlaylist()
 		back.Jeu.ListAlbums.InsertionSortAlbums()
 		back.Jeu.ListArtists.InsertionSortArtists()
 		back.Jeu.ListTracks.InsertionSortTracks()
 	}
-
+	for i := 0; i < len(back.Jeu.ListTracks.Tracks.Items); i++ {
+		back.Jeu.ListTracks.Tracks.Items[i].Temps = back.Tmps(back.Jeu.ListTracks.Tracks.Items[i].DurationMs)
+	}
 	InitTemps.Temp.ExecuteTemplate(w, "search", back.Jeu)
-}
-
-func InitFav(w http.ResponseWriter, r *http.Request) {
-	if back.Jeu.UtilisateurData.Connect {
-		if back.LstUser, err = back.ReadJSON(); err != nil {
-			fmt.Println("-----------------Error ID InitFav-----------------", err.Error())
-			return
-		}
-		IdQuery := r.URL.Query().Get("id")
-		Type := r.URL.Query().Get("type")
-
-		if back.Body, back.Fail = back.RequestApi("https://api.spotify.com/v1/" + Type + "/" + IdQuery); back.Fail.Error.Status != 200 {
-			fmt.Println("-----------------Erreur reading requestApi 1 InitFav :-----------------", back.Fail)
-			InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
-			return
-		}
-
-		switch Type {
-		case "playlist":
-			json.Unmarshal(back.Body, &back.PlaylistOff)
-			back.Jeu.Utilisateur.FavorisPlaylist = append(back.Jeu.Utilisateur.FavorisPlaylist, back.PlaylistOff)
-		case "artist":
-			json.Unmarshal(back.Body, &back.ArtistOff)
-			back.Jeu.Utilisateur.FavorisArtist = append(back.Jeu.Utilisateur.FavorisArtist, back.ArtistOff)
-		case "album":
-			json.Unmarshal(back.Body, &back.AlbumOff)
-			back.Jeu.Utilisateur.FavorisAlbum = append(back.Jeu.Utilisateur.FavorisAlbum, back.AlbumOff)
-		case "track":
-			json.Unmarshal(back.Body, &back.TrackOff)
-			back.Jeu.Utilisateur.FavorisTrack = append(back.Jeu.Utilisateur.FavorisTrack, back.TrackOff)
-		default:
-			http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
-			return
-		}
-
-		for i, c := range back.LstUser {
-			if c.Id == back.Jeu.Utilisateur.Id {
-				back.LstUser[i] = back.Jeu.Utilisateur
-				break
-			}
-		}
-		back.EditJSON(back.LstUser) //Met les données dans le JSON
-	}
-	http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
-}
-
-func Fav(w http.ResponseWriter, r *http.Request) {
-	if back.Jeu.UtilisateurData.Connect {
-		if r.URL.Query().Get("url") == "" {
-			back.Jeu.UtilisateurData.Navigate.VisitPage(r.URL.String())
-		}
-		if !Header(w) {
-			return
-		}
-		InitTemps.Temp.ExecuteTemplate(w, "fav", back.Jeu)
-		return
-	}
-	http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
 }
 
 func Propos(w http.ResponseWriter, r *http.Request) {
@@ -356,48 +455,117 @@ func Propos(w http.ResponseWriter, r *http.Request) {
 	InitTemps.Temp.ExecuteTemplate(w, "propos", back.Jeu)
 }
 
-func Suppr(w http.ResponseWriter, r *http.Request) {
+func Fav(w http.ResponseWriter, r *http.Request) {
 	if back.Jeu.UtilisateurData.Connect {
-		if back.LstUser, err = back.ReadJSON(); err != nil {
-			fmt.Println("-----------------Error ID Suppr-----------------", err.Error())
-			return
+		if r.URL.Query().Get("url") == "" {
+			back.Jeu.UtilisateurData.Navigate.VisitPage(r.URL.String())
 		}
 
-		queryID := r.URL.Query().Get("id")     //Récupére l'Id donné dans le Query string
-		queryType := r.URL.Query().Get("type") //Récupére le type donné dans le Query string
+		if back.LstUser, err = back.ReadJSON(); err != nil {
+			fmt.Println("-----------------Error ID InitFav-----------------", err.Error())
+			InitTemps.Temp.ExecuteTemplate(w, "404", back.Jeu)
+			return
+		}
+		clear(back.Jeu.ListAlbumsDetail)
+		clear(back.Jeu.ListArtistsDetail)
+		clear(back.Jeu.ListTracksDetail)
+		clear(back.Jeu.ListPlaylistDetail)
 
-		switch queryType {
-		case "playlist":
-			for i, c := range back.Jeu.Utilisateur.FavorisPlaylist {
-				if c.ID == queryID {
-					back.Jeu.Utilisateur.FavorisPlaylist = append(back.Jeu.Utilisateur.FavorisPlaylist[:i], back.Jeu.Utilisateur.FavorisPlaylist[i+1:]...) //Supprime de la liste des personnage
-					break
+		for i, c := range back.LstUser {
+			if c.Id == back.Jeu.Utilisateur.Id {
+				back.LstUser[i] = back.Jeu.Utilisateur
+				for _, s := range c.FavorisAlbum {
+					if back.Body, back.Fail = back.RequestApi(s); back.Fail.Error.Status != 200 {
+						fmt.Println("-----------------Erreur reading requestApi 1 InitFav :-----------------", back.Fail)
+						InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
+						return
+					}
+					json.Unmarshal(back.Body, &back.AlbumOff)
+					back.Jeu.ListAlbumsDetail = append(back.Jeu.ListAlbumsDetail, back.AlbumOff)
 				}
+
+				for _, s := range c.FavorisArtist {
+					if back.Body, back.Fail = back.RequestApi(s); back.Fail.Error.Status != 200 {
+						fmt.Println("-----------------Erreur reading requestApi 1 InitFav :-----------------", back.Fail)
+						InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
+						return
+					}
+					json.Unmarshal(back.Body, &back.ArtistOff)
+					back.Jeu.ListArtistsDetail = append(back.Jeu.ListArtistsDetail, back.ArtistOff)
+				}
+
+				for _, s := range c.FavorisTrack {
+					if back.Body, back.Fail = back.RequestApi(s); back.Fail.Error.Status != 200 {
+						fmt.Println("-----------------Erreur reading requestApi 1 InitFav :-----------------", back.Fail)
+						InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
+						return
+					}
+					json.Unmarshal(back.Body, &back.TrackOff)
+					back.Jeu.ListTracksDetail = append(back.Jeu.ListTracksDetail, back.TrackOff)
+					for i := 0; i < len(back.Jeu.ListTracksDetail); i++ {
+						back.Jeu.ListTracksDetail[i].Temps = back.Tmps(back.Jeu.ListTracksDetail[i].DurationMs)
+					}
+				}
+
+				for _, s := range c.FavorisPlaylist {
+					if back.Body, back.Fail = back.RequestApi(s); back.Fail.Error.Status != 200 {
+						fmt.Println("-----------------Erreur reading requestApi 1 InitFav :-----------------", back.Fail)
+						InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
+						return
+					}
+					json.Unmarshal(back.Body, &back.PlaylistOff)
+					back.Jeu.ListPlaylistDetail = append(back.Jeu.ListPlaylistDetail, back.PlaylistOff)
+				}
+				break
+			}
+		}
+		InitTemps.Temp.ExecuteTemplate(w, "fav", back.Jeu)
+		return
+	}
+	if len(back.Jeu.UtilisateurData.Navigate.History) > 0 {
+		http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
+	} else {
+		http.Redirect(w, r, "/index", http.StatusMovedPermanently)
+	}
+}
+
+func InitFav(w http.ResponseWriter, r *http.Request) {
+	if back.Jeu.UtilisateurData.Connect {
+		if back.LstUser, err = back.ReadJSON(); err != nil {
+			fmt.Println("-----------------Error ID InitFav-----------------", err.Error())
+			InitTemps.Temp.ExecuteTemplate(w, "404", back.Jeu)
+			return
+		}
+		Href := r.URL.Query().Get("href")
+		Type := r.URL.Query().Get("type")
+
+		switch Type {
+		case "playlist":
+			if !back.IsInList(back.Jeu.Utilisateur.FavorisPlaylist, Href) {
+				back.Jeu.UtilisateurData.Fav = true
+				back.Jeu.Utilisateur.FavorisPlaylist = append(back.Jeu.Utilisateur.FavorisPlaylist, Href)
 			}
 		case "artist":
-			for i, c := range back.Jeu.Utilisateur.FavorisArtist {
-				if c.ID == queryID {
-					back.Jeu.Utilisateur.FavorisArtist = append(back.Jeu.Utilisateur.FavorisArtist[:i], back.Jeu.Utilisateur.FavorisArtist[i+1:]...) //Supprime de la liste des personnage
-					break
-				}
+			if !back.IsInList(back.Jeu.Utilisateur.FavorisArtist, Href) {
+				back.Jeu.UtilisateurData.Fav = true
+				back.Jeu.Utilisateur.FavorisArtist = append(back.Jeu.Utilisateur.FavorisArtist, Href)
 			}
 		case "album":
-			for i, c := range back.Jeu.Utilisateur.FavorisAlbum {
-				if c.ID == queryID {
-					back.Jeu.Utilisateur.FavorisAlbum = append(back.Jeu.Utilisateur.FavorisAlbum[:i], back.Jeu.Utilisateur.FavorisAlbum[i+1:]...) //Supprime de la liste des personnage
-					break
-				}
+			if !back.IsInList(back.Jeu.Utilisateur.FavorisAlbum, Href) {
+				back.Jeu.UtilisateurData.Fav = true
+				back.Jeu.Utilisateur.FavorisAlbum = append(back.Jeu.Utilisateur.FavorisAlbum, Href)
 			}
 		case "track":
-			for i, c := range back.Jeu.Utilisateur.FavorisTrack {
-				if c.ID == queryID {
-					back.Jeu.Utilisateur.FavorisTrack = append(back.Jeu.Utilisateur.FavorisTrack[:i], back.Jeu.Utilisateur.FavorisTrack[i+1:]...) //Supprime de la liste des personnage
-					break
-				}
+			if !back.IsInList(back.Jeu.Utilisateur.FavorisTrack, Href) {
+				back.Jeu.Utilisateur.FavorisTrack = append(back.Jeu.Utilisateur.FavorisTrack, Href)
+				back.Jeu.UtilisateurData.Fav = true
 			}
 		default:
-			fmt.Println("queryType false :" + queryType)
-			http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
+			if len(back.Jeu.UtilisateurData.Navigate.History) > 0 {
+				http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
+			} else {
+				http.Redirect(w, r, "/index", http.StatusMovedPermanently)
+			}
 			return
 		}
 
@@ -408,8 +576,89 @@ func Suppr(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		back.EditJSON(back.LstUser) //Met les données dans le JSON
+		if !Header(w, true) {
+			return
+		}
 	}
-	http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
+	if len(back.Jeu.UtilisateurData.Navigate.History) > 0 {
+		http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
+	} else {
+		http.Redirect(w, r, "/index", http.StatusMovedPermanently)
+	}
+}
+
+func Suppr(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(back.Jeu.UtilisateurData.Connect)
+	if back.Jeu.UtilisateurData.Connect {
+		if back.LstUser, err = back.ReadJSON(); err != nil {
+			fmt.Println("-----------------Error ID Suppr-----------------", err.Error())
+			return
+		}
+
+		queryHref := r.URL.Query().Get("href") //Récupére l'Id donné dans le Query string
+		queryType := r.URL.Query().Get("type") //Récupére le type donné dans le Query string
+		fmt.Println(back.Jeu.Utilisateur)
+		switch queryType {
+		case "playlist":
+			for i, c := range back.Jeu.Utilisateur.FavorisPlaylist {
+				fmt.Println(c)
+				fmt.Println(queryHref)
+				if c == queryHref {
+					back.Jeu.Utilisateur.FavorisPlaylist = append(back.Jeu.Utilisateur.FavorisPlaylist[:i], back.Jeu.Utilisateur.FavorisPlaylist[i+1:]...) //Supprime de la liste des personnage
+					break
+				}
+			}
+		case "artist":
+			for i, c := range back.Jeu.Utilisateur.FavorisArtist {
+				if c == queryHref {
+					back.Jeu.Utilisateur.FavorisArtist = append(back.Jeu.Utilisateur.FavorisArtist[:i], back.Jeu.Utilisateur.FavorisArtist[i+1:]...) //Supprime de la liste des personnage
+					break
+				}
+			}
+		case "album":
+			for i, c := range back.Jeu.Utilisateur.FavorisAlbum {
+				if c == queryHref {
+					back.Jeu.Utilisateur.FavorisAlbum = append(back.Jeu.Utilisateur.FavorisAlbum[:i], back.Jeu.Utilisateur.FavorisAlbum[i+1:]...) //Supprime de la liste des personnage
+					break
+				}
+			}
+		case "track":
+			for i, c := range back.Jeu.Utilisateur.FavorisTrack {
+				if c == queryHref {
+					back.Jeu.Utilisateur.FavorisTrack = append(back.Jeu.Utilisateur.FavorisTrack[:i], back.Jeu.Utilisateur.FavorisTrack[i+1:]...) //Supprime de la liste des personnage
+					break
+				}
+			}
+		default:
+			fmt.Println("queryType false :" + queryType)
+			if len(back.Jeu.UtilisateurData.Navigate.History) > 0 {
+				http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
+			} else {
+				http.Redirect(w, r, "/index", http.StatusMovedPermanently)
+			}
+			return
+		}
+
+		for i, c := range back.LstUser {
+			if c.Id == back.Jeu.Utilisateur.Id {
+				back.LstUser[i] = back.Jeu.Utilisateur
+				break
+			}
+		}
+
+		if len(back.Jeu.Utilisateur.FavorisAlbum) == 0 && len(back.Jeu.Utilisateur.FavorisArtist) == 0 && len(back.Jeu.Utilisateur.FavorisPlaylist) == 0 && len(back.Jeu.Utilisateur.FavorisTrack) == 0 {
+			back.Jeu.UtilisateurData.Fav = false
+		}
+		if !Header(w, true) {
+			return
+		}
+		back.EditJSON(back.LstUser) //Met les données dans le JSON
+	}
+	if len(back.Jeu.UtilisateurData.Navigate.History) > 0 {
+		http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
+	} else {
+		http.Redirect(w, r, "/index", http.StatusMovedPermanently)
+	}
 }
 
 func Play(w http.ResponseWriter, r *http.Request) {
@@ -430,5 +679,9 @@ func Play(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("You're currently playing " + title + " of " + artist)
 		back.Jeu.UtilisateurData.Play = true
 	}
-	http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
+	if len(back.Jeu.UtilisateurData.Navigate.History) > 0 {
+		http.Redirect(w, r, back.Jeu.UtilisateurData.Navigate.GoAcutal(), http.StatusMovedPermanently)
+	} else {
+		http.Redirect(w, r, "/index", http.StatusMovedPermanently)
+	}
 }
