@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	ytb "github.com/kkdai/youtube/v2"
@@ -19,15 +20,15 @@ import (
 )
 
 var Token string
-var apiKeyYtb = "AIzaSyDf8EHLWiDh1mxWHpzhgEu-7FWK5VZESNg"
+var apiKeyYtb = []string{"AIzaSyDf8EHLWiDh1mxWHpzhgEu-7FWK5VZESNg", "AIzaSyBufrRomGBRjjeRmbMW38UO0piC6DG-F5Y", "AIzaSyCk7g4JR_Ea3dywU-v7RiS7S1JNSUFB_Gk", "AIzaSyB3zV564501sl-HN4yWwju1cziIKWVbWv8","AIzaSyBoYLiHCv1UHBgHrhHmFKo8-xoBjm1fjH8","AIzaSyBsKRnoelWNjFGchQ5ynWq8qVz8deQ6RP4"}
 var Err error
 
 // Demande a l'api son corps sous un format JSON et le met dans une structure
 func RequestApi(apiURL string) ([]byte, ErreurApi) {
-	//fmt.Println(apiURL)
+	fmt.Println(apiURL)
 	//Initialisation du client
 	httpClient := http.Client{
-		Timeout: time.Second * 4, //Timeout après 4 seconds
+		Timeout: time.Second * 10, //Timeout après 10 seconds
 	}
 	//Création de la reguête HTTP avec un GET vers l'api
 	req, errReq := http.NewRequest("GET", apiURL, nil)
@@ -114,6 +115,7 @@ func ReloadApi() {
 
 // Fonction pour mettre le JSON dans une struct
 func ReadJSON() ([]Client, error) {
+	fmt.Println("JSON en cours de lecture...")
 	jsonFile, err := os.ReadFile("JSON/login.json")
 	if err != nil {
 		fmt.Println("-----------------Error reading-----------------", err.Error())
@@ -126,7 +128,7 @@ func ReadJSON() ([]Client, error) {
 
 // Fonction pour modifié le JSON
 func EditJSON(ModifiedClient []Client) {
-
+	fmt.Println("JSON en cours de modification...")
 	modifiedJSON, errMarshal := json.Marshal(ModifiedClient)
 	if errMarshal != nil {
 		fmt.Println("-----------------Error encodage -----------------", errMarshal.Error())
@@ -155,6 +157,7 @@ func MdpCrypt(Mdp string) string {
 	hasher := sha256.New()
 	hasher.Write([]byte(Mdp))
 	hashedPassword := hex.EncodeToString(hasher.Sum(nil))
+	fmt.Println("MDP crypté")
 	return hashedPassword // mdp crypter
 }
 
@@ -209,16 +212,19 @@ func TransformSlice(s []string) string { //Met un []string en mot
 
 // Fonction pour generer une lettre
 func GetRandomLetter() string {
+	rand.Seed(time.Now().UnixNano())
 	return string('a' + rune(rand.Intn(26)))
 }
 
 // Fonction pour generer un chiffre entre 0 et 988
 func RandOffset() string {
+	rand.Seed(time.Now().UnixNano())
 	return strconv.Itoa(rand.Intn(988))
 }
 
-//Fonction trie insertion pour le nom 
-func (arrayToSort *Playlist)InsertionSortPlaylist() {
+// Fonction trie insertion pour le nom
+func (arrayToSort *Playlist) InsertionSortPlaylist() {
+	fmt.Println("Playlist en cours de trie...")
 	for index := 1; index < len(arrayToSort.Playlists.Items); index++ {
 		currentItem := arrayToSort.Playlists.Items[index]
 		currentLeftIndex := index - 1
@@ -230,9 +236,11 @@ func (arrayToSort *Playlist)InsertionSortPlaylist() {
 
 		arrayToSort.Playlists.Items[currentLeftIndex+1] = currentItem
 	}
+	fmt.Println("Trie finie")
 }
 
-func (arrayToSort *Artists)InsertionSortArtists() {
+func (arrayToSort *Artists) InsertionSortArtists() {
+	fmt.Println("Artists en cours de trie...")
 	for index := 1; index < len(arrayToSort.Artists.Items); index++ {
 		currentItem := arrayToSort.Artists.Items[index]
 		currentLeftIndex := index - 1
@@ -244,9 +252,11 @@ func (arrayToSort *Artists)InsertionSortArtists() {
 
 		arrayToSort.Artists.Items[currentLeftIndex+1] = currentItem
 	}
+	fmt.Println("Trie finie")
 }
 
-func (arrayToSort *Albums)InsertionSortAlbums() {
+func (arrayToSort *Albums) InsertionSortAlbums() {
+	fmt.Println("Albums en cours de trie...")
 	for index := 1; index < len(arrayToSort.Albums.Items); index++ {
 		currentItem := arrayToSort.Albums.Items[index]
 		currentLeftIndex := index - 1
@@ -258,9 +268,11 @@ func (arrayToSort *Albums)InsertionSortAlbums() {
 
 		arrayToSort.Albums.Items[currentLeftIndex+1] = currentItem
 	}
+	fmt.Println("Trie finie")
 }
 
-func (arrayToSort *Track)InsertionSortTracks() {
+func (arrayToSort *Track) InsertionSortTracks() {
+	fmt.Println("Track en cours de trie...")
 	for index := 1; index < len(arrayToSort.Tracks.Items); index++ {
 		currentItem := arrayToSort.Tracks.Items[index]
 		currentLeftIndex := index - 1
@@ -272,10 +284,10 @@ func (arrayToSort *Track)InsertionSortTracks() {
 
 		arrayToSort.Tracks.Items[currentLeftIndex+1] = currentItem
 	}
+	fmt.Println("Trie finie")
 }
 
-
-func (alb AlbumPrecision)TempsAlbum() string {
+func (alb AlbumPrecision) TempsAlbum() string {
 	var miliseconds int
 	for _, c := range alb.Tracks.Items {
 		miliseconds += c.DurationMs
@@ -283,7 +295,7 @@ func (alb AlbumPrecision)TempsAlbum() string {
 	return Tmps(miliseconds)
 }
 
-func (alb PlaylistPrecision)TempsPlaylist() string {
+func (alb PlaylistPrecision) TempsPlaylist() string {
 	var miliseconds int
 	for _, c := range alb.Tracks.Items {
 		miliseconds += c.Track.DurationMs
@@ -291,7 +303,7 @@ func (alb PlaylistPrecision)TempsPlaylist() string {
 	return Tmps(miliseconds)
 }
 
-//Calcul de miliseconds en heure ou minute
+// Calcul de miliseconds en heure ou minute
 func Tmps(miliseconds int) string {
 	var temps Duree
 
@@ -300,22 +312,44 @@ func Tmps(miliseconds int) string {
 
 	temps.min = miliseconds / (1000 * 60)
 	miliseconds %= 1000 * 60
-	
+
 	temps.sec = miliseconds / 1000
-	
+
 	return formatDuree(temps)
 }
 
-//Affichage du temps comme sur spotify
+// Affichage du temps comme sur spotify
 func formatDuree(temps Duree) string {
 	if temps.heure > 0 {
 		return strconv.Itoa(temps.heure) + " heure " + strconv.Itoa(temps.min) + " min "
 	}
+	if len(strconv.Itoa(temps.sec)) == 1 {
+		return strconv.Itoa(temps.min) + ":0" + strconv.Itoa(temps.sec)
+	}
 	return strconv.Itoa(temps.min) + ":" + strconv.Itoa(temps.sec)
 }
 
-//Téléchargement d'une vidéo ytb
+// Affichage des abonnement
+func FormatAbo(number int) string {
+	numStr := strconv.Itoa(number)
+	if len(numStr) <= 3 {
+		return numStr
+	}
+
+	var result string
+	for i := 0; i < len(numStr); i++ {
+		if i > 0 && (len(numStr)-i)%3 == 0 {
+			result += " "
+		}
+		result += string(numStr[i])
+	}
+
+	return result
+}
+
+// Téléchargement d'une vidéo ytb
 func Download(videoID string) (string, error) {
+	fmt.Println("La vidéo " + videoID + " est en cours de chargement")
 	client := ytb.Client{}
 
 	video, err := client.GetVideo(videoID)
@@ -342,51 +376,69 @@ func Download(videoID string) (string, error) {
 		fmt.Println("Error putting stream at file ", err)
 		return "", err
 	}
-
+	fmt.Println("Fin du chargement")
 	return videoID, nil
 }
 
-//Retourne le nombre de like d'une vidéo sur ytb
-func Like(searchTerm string) int {
+// Retourne le nombre de like d'une vidéo sur ytb
+func Like(searchTerm string) string {
+	if len(apiKeyYtb) <= 0 {
+		fmt.Println("Erreur lors de la recherche de vidéos : googleapi: Error 403: The request cannot be completed because you have exceeded your <a href='/youtube/v3/getting-started#quota'>quota</a>., quotaExceeded")
+		return "0"
+	}
 	client := &http.Client{
-		Transport: &transport.APIKey{Key: apiKeyYtb},
+		Transport: &transport.APIKey{Key: apiKeyYtb[0]},
 	}
 
 	service, err := youtube.New(client)
 	if err != nil {
 		fmt.Printf("Erreur lors de la création du client YouTube : %v\n", err)
-		return 0
+		return "0"
 	}
 
 	searchResponse, err := service.Search.List([]string{"id", "snippet"}).Q(searchTerm).Type("video").MaxResults(1).Do()
 	if err != nil {
+		if strings.Contains(err.Error(), "Error 403") {
+			apiKeyYtb = apiKeyYtb[1:]
+			fmt.Println("Changement de compte")
+			return Like(searchTerm)
+		}
 		fmt.Printf("Erreur lors de la recherche de vidéos : %v\n", err)
-		return 0
+		return "0"
 	}
 
 	if len(searchResponse.Items) == 0 {
 		fmt.Printf("Aucune vidéo trouvée pour le terme de recherche : %s\n", searchTerm)
-		return 0
+		return "0"
 	}
 
 	if videoStatsResponse, err := service.Videos.List([]string{"statistics"}).Id(searchResponse.Items[0].Id.VideoId).Do(); err != nil {
 		fmt.Printf("Erreur lors de la récupération des statistiques de la vidéo : %v\n", err)
-		return 0
+		return "0"
 	} else {
-		return int(videoStatsResponse.Items[0].Statistics.LikeCount)
+		return FormatAbo(int(videoStatsResponse.Items[0].Statistics.LikeCount))
 	}
 }
 
-//Retourne l'id d'une vidéo sur ytb
+// Retourne l'id d'une vidéo sur ytb
 func IdYtb(search string) string {
+	if len(apiKeyYtb) <= 0 {
+		fmt.Println("Erreur lors de la recherche de vidéos : googleapi: Error 403: The request cannot be completed because you have exceeded your <a href='/youtube/v3/getting-started#quota'>quota</a>., quotaExceeded")
+		return "0"
+	}
 	client := &http.Client{
-		Transport: &transport.APIKey{Key: apiKeyYtb},
+		Transport: &transport.APIKey{Key: apiKeyYtb[0]},
 	}
 
 	service, err := youtube.New(client)
 	if err != nil {
+		if strings.Contains(err.Error(), "Error 403") {
+			apiKeyYtb = apiKeyYtb[1:]
+			fmt.Println("Changement de compte")
+			return Like(search)
+		}
 		fmt.Printf("Erreur lors de la création du client YouTube : %v", err)
-		return "dQw4w9WgXcQ"//Rick Roll
+		return "dQw4w9WgXcQ" //Rick Roll
 	}
 
 	searchResponse, err := service.Search.List([]string{"id", "snippet"}).Q(search).Type("video").MaxResults(1).Do()
