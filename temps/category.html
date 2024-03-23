@@ -1,21 +1,23 @@
 {{define "category"}}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>category</title>
     <link rel="stylesheet" href="../static/css/base.css">
-    <link rel="stylesheet" href="../static/css/display.css">
+    <link rel="stylesheet" href="../static/css/category.css">
     <link rel="icon" href="/static/img/logo/spot.png" />
 </head>
+
 <body>
     <div class="up">
         {{template "header" .}}
         <section class="body-global">
             <div class="connection-global">
                 <div class="btn">
-                    <a href="/url?url=before"  class="btn-gauche">❮</a>
+                    <a href="/url?url=before" class="btn-gauche">❮</a>
                     <a href="/url?url=after" class="btn-droite">❯</a>
 
                 </div>
@@ -38,14 +40,18 @@
             {{if eq .Cat "album"}}
             <div class="playlist">
                 {{range .ListAlbums.Albums.Items}}
-                <div class="individual">
-                    {{range .Images}}
-                    <img src="{{.URL}}" alt="cover">
-                    {{break}}
-                    {{end}}
-                    <div class="cover-info album">
-                        <p class="titre">{{.Name}}</p>
-                        <p class="detail">{{range .Artists}}{{.Name}}•{{end}}</p>
+                <div class="album-individual">
+                    <a href="/detail?href={{.Href}}&type=album" class="pdp-playlist">
+                        {{range .Images}}
+                        <img src="{{.URL}}" alt="pdp-playlist">
+                        {{break}}
+                        {{end}}
+                    </a>
+                    <div class="blaze">
+                        <p>{{.Name}}</p>
+                    </div>
+                    <div class="detail">
+                        <p>{{.ReleaseDate}} • {{range .Artists}}{{.Name}}{{end}}</p>
                     </div>
                 </div>
                 {{end}}
@@ -61,14 +67,19 @@
             {{else if eq .Cat "track"}}
             <div class="playlist">
                 {{range .ListTracks.Tracks.Items}}
-                <div class="individual">
-                    {{range .Album.Images}}
-                    <img src="{{.URL}}" alt="cover">
-                    {{break}}
-                    {{end}}
-                    <div class="cover-info album">
-                        <p class="titre">{{.Name}}</p>
-                        <p class="detail">{{range .Artists}}{{.Name}}•{{end}}</p>
+                <div class="playlist-individual">
+                    <a href="/detail?href={{.Href}}&type=track" class="pdp-playlist">
+                        {{range .Album.Images}}
+                        <img src="{{.URL}}" alt="pdp-playlist">
+                        {{break}}
+                        {{end}}
+                    </a>
+                    <div class="blaze">
+                        <p>{{.Name}}</p>
+                    </div>
+                    <div class="detail song">
+                        <p>Par {{range .Artists}}{{.Name}}, {{end}}</p>
+                        <p>{{.Temps}}</p>
                     </div>
                 </div>
                 {{end}}
@@ -84,13 +95,22 @@
             {{else if eq .Cat "artist"}}
             <div class="playlist">
                 {{range .ListArtists.Artists.Items}}
-                <div class="individual">
-                    {{range .Images}}
-                    <img src="{{.URL}}" alt="cover">
-                    {{break}}
-                    {{end}}
-                    <div class="cover-info album">
-                        <p class="titre">{{.Name}}</p>
+                <div class="artist-individual">
+                    <a href="/detail?href={{.Href}}&type=artist" class="pdp">
+                        {{range .Images}}
+                        {{if and (ne .URL "") (ne .URL nil)}}
+                        <img src="{{.URL}}" alt="pdp artist">
+                        {{else}}
+                        <img src="/static/img/nopdp.png" alt="pdp artist">
+                        {{end}}
+                        {{break}}
+                        {{end}}
+                    </a>
+                    <div class="blaze">
+                        <p>{{.Name}}</p>
+                    </div>
+                    <div class="detail">
+                        <p>Artist</p>
                     </div>
                 </div>
                 {{end}}
@@ -106,14 +126,18 @@
             {{else if eq .Cat "playlist"}}
             <div class="playlist">
                 {{range .ListPlaylist.Playlists.Items}}
-                <div class="individual">
-                    {{range .Images}}
-                    <img src="{{.URL}}" alt="cover">
-                    {{break}}
-                    {{end}}
-                    <div class="cover-info album">
-                        <p class="titre">{{.Name}}</p>
-                        <p class="detail">{{.Description}}</p>
+                <div class="playlist-individual">
+                    <a href="/detail?href={{.Href}}&type=playlist" class="pdp-playlist">
+                        {{range .Images}}
+                        <img src="{{.URL}}" alt="pdp-playlist">
+                        {{break}}
+                        {{end}}
+                    </a>
+                    <div class="blaze">
+                        <p>{{.Name}}</p>
+                    </div>
+                    <div class="detail">
+                        <p>Par {{.Owner.DisplayName}}</p>
                     </div>
                 </div>
                 {{end}}
@@ -131,5 +155,6 @@
     </div>
     {{template "footer" .}}
 </body>
+
 </html>
 {{end}}

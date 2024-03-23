@@ -5,16 +5,16 @@
             <img src="/static/img/home.png" class="home-outline" />
             <p>Accueil</p>
         </a>
-        <div class="nav-recherche">
+        <a href="/search" class="nav-recherche">
             <img src="/static/img/search.png" class="search-outline" />
             <p>Recherche</p>
-        </div>
+        </a>
     </div>
     <div class="collection-global">
-        <a href="/display" class="collection-titre">
+        <div class="collection-titre">
             <img src="/static/img/collection.png" class="albums-outline" />
             <p>Collection</p>
-        </a>
+        </div>
         <div class="carroussel-global">
             <a href="/category?c=album">Albums</a>
             <a href="/category?c=track">Track</a>
@@ -22,9 +22,9 @@
             <a href="/category?c=artist">Artistes</a>
         </div>
         <div class="tarck-global">
-            <!-- faire en sorte que lorque l'on est connecté c'est les favoris -->
-            {{range .Header.Albums.Items}}
-            <a href="/detail?href={{.Href}}&type={{.Type}}" class="track">
+            {{if .UtilisateurData.Fav}}
+            {{range .UtilisateurData.FavorisAlbums}}
+            <a href="/detail?href={{.Href}}&type={{.Type}}" class="header-track">
                 <div class="img-track">
                     {{range .Images}} {{if eq .Width 640}}
                     <img src="{{.URL}}" alt="" height="100%" />
@@ -37,13 +37,91 @@
                     <div class="info-artist">
                         {{range .Artists}}
                         <p>{{.Name}}</p>
-                         {{end}}
+                        {{end}}
                     </div>
                     <div class="info-date">
                         <p>{{.ReleaseDate}}</p>
                     </div>
                 </div>
             </a>
+            {{end}}
+            {{range .UtilisateurData.FavorisPlaylist}}
+            <a href="/detail?href={{.Href}}&type={{.Type}}" class="header-track">
+                <div class="img-track">
+                    {{range .Images}} {{if eq .Width 640}}
+                    <img src="{{.URL}}" alt="" height="100%" />
+                    {{break}} {{end}} {{end}}
+                </div>
+                <div class="info-global">
+                    <div class="info-titre">
+                        <p><strong>{{.Name}}</strong></p>
+                    </div>
+                    <div class="info-artist">
+                       <p>{{.Owner.DisplayName}}</p>
+                    </div>
+                    <div class="info-date">
+                        <p>{{.Temps}}</p>
+                    </div>
+                </div>
+            </a>
+            {{end}}
+            {{range .UtilisateurData.FavorisArtists}}
+            <a href="/detail?href={{.Href}}&type={{.Type}}" class="header-track">
+                <div class="img-track">
+                    {{range .Images}} {{if eq .Width 640}}
+                    <img src="{{.URL}}" alt="" height="100%" />
+                    {{break}} {{end}} {{end}}
+                </div>
+                <div class="info-global">
+                    <div class="info-titre">
+                        <p><strong>{{.Name}}</strong></p>
+                    </div>
+                    <div class="info-artist">
+                       <p>Artist</p>
+                    </div>
+                </div>
+            </a>
+            {{end}}
+            {{range .UtilisateurData.FavorisTracks}}
+            <a href="/detail?href={{.Href}}&type={{.Type}}" class="header-track">
+                <div class="img-track">
+                    {{range .Album.Images}} {{if eq .Width 640}}
+                    <img src="{{.URL}}" alt="" height="100%" />
+                    {{break}} {{end}} {{end}}
+                </div>
+                <div class="info-global">
+                    <div class="info-titre">
+                        <p><strong>{{.Name}}</strong></p>
+                    </div>
+                    <div class="info-artist">
+                       <p>Track</p>
+                    </div>
+                </div>
+            </a>
+            {{end}}
+            {{else}}
+            {{range .Header.Albums.Items}}
+            <a href="/detail?href={{.Href}}&type={{.Type}}" class="header-track">
+                <div class="img-track">
+                    {{range .Images}} {{if eq .Width 640}}
+                    <img src="{{.URL}}" alt="" height="100%" />
+                    {{break}} {{end}} {{end}}
+                </div>
+                <div class="info-global">
+                    <div class="info-titre">
+                        <p><strong>{{.Name}}</strong></p>
+                    </div>
+                    <div class="info-artist">
+                        {{range .Artists}}
+                        <p>{{.Name}}</p>
+                        {{end}}
+                    </div>
+                    <div class="info-date">
+                        <p>{{.ReleaseDate}}</p>
+                    </div>
+                </div>
+            </a>
+            {{end}}
             {{end}}
         </div>
     </div>

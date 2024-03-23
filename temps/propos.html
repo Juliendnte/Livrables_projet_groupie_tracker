@@ -1,15 +1,55 @@
 {{define "propos"}}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APropos</title>
-    <link rel="icon" href="/static/img/spot.png" />
-
+    <title>À Propos</title>
+    <link rel="stylesheet" href="/static/css/propos.css">
 </head>
 <body>
-    
+    <header>
+        <h1>À Propos</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Maquettes</h2>
+            <div>
+                <img src="/static/maquette/Capture d'écran 2024-02-24 104044.png" alt="maquette">
+                <img src="/static/maquette/Capture d'écran 2024-03-17 143227.png" alt="maquette">
+                <img src="/static/maquette/Capture d'écran 2024-03-17 143738.png" alt="maquette">
+            </div>
+        </section>
+        <section>
+            <h2>Liste des Tâches</h2>
+            <ol>
+                <li>Choix initial de l'API : Spoonacular</li>
+                <li>Confrontation aux contraintes de l'API (150 requêtes par jour)</li>
+                <li>Changement vers l'API de Spotify</li>
+                <li>Rattrapage du retard accumulé</li>
+                <li>Problèmes avec les filtres de l'API Spotify</li>
+                <li>Intégration des API YouTube et Deezer pour des filtres pertinents</li>
+                <li>Développement du back-end</li>
+                <li>Développement du front-end</li>
+                <li>Correction des bugs et finalisation des fonctionnalités</li>
+            </ol>
+        </section>
+        <section>
+            <h2>Difficultés Rencontrées</h2>
+            <p>
+                Les principales difficultés rencontrées lors de ce projet ont été liées aux contraintes de l'API initiale, 
+                notamment le nombre limité de requêtes par jour. Le changement vers l'API de Spotify a également présenté 
+                des défis, en particulier en ce qui concerne les filtres disponibles. Pour résoudre ce problème, j'ai dû 
+                combiner les fonctionnalités de plusieurs APIs, notamment YouTube et Deezer, afin d'obtenir des filtres 
+                plus pertinents. Cela a entraîné un retard dans le projet, mais grâce à une réorganisation efficace, 
+                j'ai pu rattraper le retard et finaliser le projet dans les délais impartis.
+            </p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 DANTE Julien</p>
+    </footer>
 </body>
 </html>
+
 {{end}}

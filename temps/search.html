@@ -1,20 +1,23 @@
 {{define "search"}}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search</title>
     <link rel="stylesheet" href="../static/css/base.css">
+    <link rel="stylesheet" href="../static/css/search.css">
     <link rel="icon" href="/static/img/spot.png" />
 </head>
+
 <body>
     <div class="up">
         {{template "header" .}}
         <section class="body-global">
             <div class="connection-global">
                 <div class="btn">
-                    <a href="/url?url=before"  class="btn-gauche">❮</a>
+                    <a href="/url?url=before" class="btn-gauche">❮</a>
                     <a href="/url?url=after" class="btn-droite">❯</a>
 
                 </div>
@@ -33,12 +36,238 @@
                 </div>
                 {{end}}
             </div>
-            <div>
-                
+            <div class="header-input">
+                <div class="search">
+                    <form role="search" action="/search" method="get">
+                        <div class="group">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
+                                <g>
+                                    <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+                                </g>
+                            </svg>
+                            <input class="input" type="search" name="search" maxlength="800" autocorrect="off" autocapitalize="none" spellcheck="false"
+                            placeholder="Que souhaitez-vous écouter &nbsp;?">
+                        </div>
+                    </form>
+                </div>
+                <div class="button-filtre" onclick="Affiche()">
+                    <p>Filtre</p>
+                </div>
+            </div>
+            
+            <div id="filtre" class="filtre">
+                <form action="/search" class="filtre-form" method="post">
+                    <div class="fermer" onclick="Enleve()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512">
+                            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="32" d="M368 368L144 144M368 144L144 368" /></svg>
+                    </div>
+                    <div class="follower-global">
+                        <div class="follower-titre">
+                            <label class="label" for="follower">Follower</label>
+                        </div>
+                        <div class="foll">
+
+                            <input type="radio" name="follower" value="0" checked hidden>
+                            <div>
+                                <input type="radio" name="follower" value="1000">
+                                <label for="1k">Moins de 1 000</label>
+                            </div>
+                            <div>
+                                <input type="radio" name="follower" value="100000">
+                                <label for="10k">10 000</label>
+                            </div>
+                            <div>
+                                <input type="radio" name="follower" value="100000">
+                                <label for="100k">100 000</label>
+                            </div>
+                            <div>
+                                <input type="radio" name="follower" value="500000">
+                                <label for="500k"> 500 000 </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="follower" value="1000000">
+                                <label for="1M"> 1 000 000 </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="follower" value="5000000">
+                                <label for="5M">Plus de 5 000 000</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="genres-global">
+                        <div>
+                            <label class="label" for="genre">Genres Musicaux</label>
+                        </div>
+                        <div class="genres">
+                            {{range .AllGenres.Genres}}
+                            <div class="genre">
+                                <input type="checkbox" name="genre" value="{{.}}">
+                                <label for="genre">{{.}}</label>
+                            </div>
+                            {{end}}
+                        </div>
+                    </div>
+                    <div class="alphaphetique-global">
+                        <div>
+                            <label class="label" for="alphaphetique">Tri A->Z</label>
+                        </div>
+                        <div class="alphaphetique">
+                            <input type="radio" name="alha" value="ok">
+                            <label for="alha">
+                                <div class="alha-p">
+                                    <div class="toujours-alha">
+                                        <p>A</p>
+                                        <p>Z</p>
+                                    </div>
+                                    <div class="presque-alha">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512">
+                                            <path fill="none" stroke="currentColor" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="38"
+                                                d="M112 268l144 144 144-144M256 392V100" /></svg>
+                                    </div>
+                                </div>
+                            </label>
+                            <label for="pasalha">
+                                <input type="radio" name="alha" value="pasok" checked>
+                                <div class="pasalha-p">
+                                    <div class="toujours-pasalha">
+                                        <p>A</p>
+                                        <p>Z</p>
+                                    </div>
+                                    <div class="presque-pasalha">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512">
+                                            <path fill="none" stroke="currentColor" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="32"
+                                                d="M368 368L144 144M368 144L144 368" /></svg>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <input type="submit" value="Envoyer" placeholder="Envoyer">
+                </form>
+            </div>
+            <div class="main">
+                <div class="container">
+                    {{if ne .ListArtists.Artists.Total 0}}
+                    <div class="Nom">
+                        <p>Artistes</p>
+                    </div>
+                    <div class="artist">
+                        {{range .ListArtists.Artists.Items}}
+                        <div class="artist-individual">
+                            <a href="/detail?href={{.Href}}&type=artist" class="pdp">
+                                {{range .Images}}
+                                {{if and (ne .URL "") (ne .URL nil)}}
+                                <img src="{{.URL}}" alt="pdp artist">
+                                {{else}}
+                                <img src="/static/img/nopdp.png" alt="pdp artist">
+                                {{end}}
+                                {{break}}
+                                {{end}}
+                            </a>
+                            <div class="blaze">
+                                <p>{{.Name}}</p>
+                            </div>
+                            <div class="detail">
+                                <p>Artist</p>
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
+                    {{end}}
+                </div>
+                <div class="container">
+                    {{if ne .ListAlbums.Albums.Total 0}}
+                    <div class="Nom">
+                        <p>Albums</p>
+                    </div>
+                    <div class="album">
+                        {{range .ListAlbums.Albums.Items}}
+                        <div class="album-individual">
+                            <a href="/detail?href={{.Href}}&type=album" class="pdp-album">
+                                {{range .Images}}
+                                <img src="{{.URL}}" alt="pdp album">
+                                {{break}}
+                                {{end}}
+                            </a>
+                            <div class="blaze">
+                                <p>{{.Name}}</p>
+                            </div>
+                            <div class="detail">
+                                <p>{{.ReleaseDate}} • {{range .Artists}}{{.Name}}{{end}}</p>
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
+                    {{end}}
+                </div>
+                <div class="container">
+                    {{if ne .ListPlaylist.Playlists.Total 0}}
+                    <div class="Nom">
+                        <p>Playlist</p>
+                    </div>
+                    <div class="playlist">
+                        {{range .ListPlaylist.Playlists.Items}}
+                        <div class="playlist-individual">
+                            <a href="/detail?href={{.Href}}&type=playlist" class="pdp-playlist">
+                                {{range .Images}}
+                                <img src="{{.URL}}" alt="pdp-playlist">
+                                {{break}}
+                                {{end}}
+                            </a>
+                            <div class="blaze">
+                                <p>{{.Name}}</p>
+                            </div>
+                            <div class="detail">
+                                <p>Par {{.Owner.DisplayName}}</p>
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
+                    {{end}}
+                </div>
+                <div class="container">
+                    {{if ne .ListTracks.Tracks.Total 0}}
+                    <div class="Nom">
+                        <p>Track</p>
+                    </div>
+                    <div class="track">
+                        {{range .ListTracks.Tracks.Items}}
+                        <a href="/detail?href={{.Href}}&type=track"  class="playlist-individual">
+                            {{range .Album.Images}}
+                            <div class="pdp-playlist">
+                                <img src="{{.URL}}" alt="pdp-playlist">
+                            </div>
+                            {{break}}
+                            {{end}}
+                            <div class="blaze">
+                                <p>{{.Name}}</p>
+                            </div>
+                            <div class="detail song">
+                                <p>Par {{range .Artists}}{{.Name}}, {{end}}</p>
+                                <p>{{.Temps}}</p>
+                            </div>
+                        </a>
+                        {{end}}
+                    </div>
+                    {{end}}
+                </div>
             </div>
         </section>
     </div>
     {{template "footer" .}}
+    <script>
+        function Affiche(){
+            var filtre = document.getElementById("filtre");
+            filtre.style.display="flex";
+        }
+        function Enleve(){
+            var filtre = document.getElementById("filtre");
+            filtre.style.display="none";
+        }
+    </script>
 </body>
 </html>
 {{end}}

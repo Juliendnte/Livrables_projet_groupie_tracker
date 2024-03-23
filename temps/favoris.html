@@ -7,59 +7,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Favoris</title>
     <link rel="icon" href="/static/img/logo/spot.png" />
-
+    <link rel="stylesheet" href="/static/css/log.css" />
 </head>
 
 <body>
     <div class="global">
-        <div>
-            {{if eq .Utilisateur.Img "vert"}}
-            <a href="/logout" class="vert">
-                <p>{{.Utilisateur.Letter}}</p>
-            </a>
-            {{else}}
-            <a href="/logout">
-                <img src="/static/img/{{.Utilisateur.Img}}" class="pdp" />
-            </a>
-            {{end}}
-            <p>{{.Utilisateur.Name}}</p>
+        <div class="fav-head">
+            <div class="home">
+                <a href="/index" class="pdp-fav">Accueil</a>
+            </div>
+            <div class="logo-fav">
+                {{if eq .Utilisateur.Img "vert"}}
+                <form action="/img" method="post" enctype="multipart/form-data">
+                    <input id="fileInput" name="Img" type="file" accept="image/png, image/jpeg" style="display: none;">
+                    <label for="fileInput" id="customButton" class="input-img"></label>
+                    <input type="submit" id="submitButton" value="envoyer">
+                    <p class="vert">{{.Utilisateur.Letter}}</p>
+                </form>
+                {{else}}
+                <form action="/img" method="post">
+                    <img src="/static/img/{{.Utilisateur.Img}}" class="pdp-fav" />
+                </form>
+                {{end}}
+                <p class="deco">{{.Utilisateur.Name}}</p>
+                <a href="/logout" class="deco">Deconnexion</a>
+            </div>
+            <div></div>
         </div>
         <div class="favoris">
             <div class="artist">
-                {{range .Utilisateur.FavorisArtist}}
+                {{range .ListArtistsDetail}}
                 <div class="profil">
                     {{range .Images}}
                     <img src="{{.URL}}" alt="pdp_artiste">
+                    {{break}}
                     {{end}}
                     <p>{{.Name}}</p>
                 </div>
                 {{end}}
             </div>
             <div class="album">
-                {{range .Utilisateur.FavorisAlbum}}
+                {{range .ListAlbumsDetail}}
                 <div class="profil">
                     {{range .Images}}
                     <img src="{{.URL}}" alt="pdp_artiste">
+                    {{break}}
                     {{end}}
                     <p>{{.Name}}</p>
                 </div>
                 {{end}}
             </div>
             <div class="track">
-                {{range .Utilisateur.FavorisTrack}}
+                {{range .ListTracksDetail}}
                 <div class="profil">
-                    {{range .Images}}
+                    {{range .Album.Images}}
                     <img src="{{.URL}}" alt="pdp_artiste">
+                    {{break}}
                     {{end}}
                     <p>{{.Name}}</p>
                 </div>
                 {{end}}
             </div>
             <div class="playlist">
-                {{range .Utilisateur.FavorisPlaylist}}
+                {{range .ListPlaylistDetail}}
                 <div class="profil">
                     {{range .Images}}
                     <img src="{{.URL}}" alt="pdp_artiste">
+                    {{break}}
                     {{end}}
                     <p>{{.Name}}</p>
                 </div>
@@ -67,6 +81,15 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function () {
+            var file = this.files[0];
+            if (file) {
+                console.log("envoyer")
+                //document.getElementById('submitButton').disabled = false;
+            }
+        });
+    </script>
 </body>
 
 </html>
