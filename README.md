@@ -1,7 +1,6 @@
 # Livrables_projet_groupie_tracker
-# Gestion de Ressources Musicales
 
-Ce dépôt contient une solution de gestion de ressources musicales, offrant diverses fonctionnalités telles que la recherche, la consultation de détails, la gestion de favoris et bien plus encore. Ce guide vous aidera à démarrer avec la solution et vous fournira une liste détaillée des routes disponibles.
+Ce dépôt contient une solution de gestion de ressources musicales, offrant diverses fonctionnalités telles que la recherche, la consultation en détails, la gestion de favoris et bien plus encore. Ce guide vous aidera à démarrer avec la solution et vous fournira une liste détaillée des routes disponibles.
 
 ## Lancement de la Solution
 
@@ -31,7 +30,7 @@ Pour lancer la solution localement, suivez ces étapes :
   - Page de catégorie affichant des ressources spécifiques à un endpoint avec pagination.
 
 - **"/search"** :
-  - Page de recherche permettant de rechercher dans les playlists, albums, artistes et morceaux avec des filtres sur le nombre de followers et le genre musical, triés par ordre alphabétique.
+  - Page de recherche permettant de rechercher dans les playlists, albums, artistes et morceaux avec des filtres sur le nombre de followers, le genre musical,et trie par ordre alphabétique.
 
 - **"/propos"** :
   - Page à propos expliquant le projet.
@@ -74,7 +73,7 @@ Pour lancer la solution localement, suivez ces étapes :
 
 Explorez ces routes pour découvrir les fonctionnalités offertes par la solution !
 
-**Remarque :** Si vous avez des questions ou des retours, n'hésitez pas à nous contacter.
+**Remarque :** Si vous avez des questions ou des retours, n'hésitez pas à me contacter.
 
-**Bon développement !** 🎵🚀
+**Bonne Exploration !** 🎵🚀
 
