@@ -273,6 +273,14 @@ button {
     font-size: 14px;
 }
 
+.pdp{
+   width: 60px;
+   height: 60px;
+    margin-top: 30px;
+    margin-right: 20px;
+    border-radius: 50%
+}
+
 .footer-doc{
     display: flex;
     flex-direction: column;

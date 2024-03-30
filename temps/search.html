@@ -8,7 +8,7 @@
     <title>Search</title>
     <link rel="stylesheet" href="../static/css/base.css">
     <link rel="stylesheet" href="../static/css/search.css">
-    <link rel="icon" href="/assets/img/logo/spot.png" />
+    <link rel="icon" href="/static/img/logo/spot.png" />
 </head>
 
 <body>
@@ -150,12 +150,10 @@
             </div>
             <div class="main">
                 {{if and (eq .ListArtists.Artists.Total 0) (eq .ListAlbums.Albums.Total 0) (eq .ListPlaylist.Playlists.Total 0) (eq .ListTracks.Tracks.Total 0)}}
-                    <p class="pas_trouve">Nous n'avons pas trouvé de ressource suite à votre recherche </p>
+                    <p class="pas_trouve">Aucun résultats</p>
                 {{else}}
                 <div class="container">
-                    <p>a</p>
                     {{if ne .ListArtists.Artists.Total 0}}
-                    <p>a</p>
                     <div class="Nom">
                         <p>Artistes</p>
                     </div>
