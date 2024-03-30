@@ -175,9 +175,9 @@
                             </svg>
                         </div>
                     </div>
-                    <div class="songs">
+                    <ol class="songs">
                         {{range .AlbumsDetail.Tracks.Items}}
-                        <div class="song">
+                        <li class="song">
                             <div class="info_song">
                                 <div class="lis">
                                     <a href="/detail?href={{.Href}}&type={{.Type}}">{{.Name}}</a>
@@ -189,7 +189,7 @@
                             <div class="tmp">
                                 {{.Temps}}
                             </div>
-                        </div>
+                        </li>
                         {{end}}
 
                         <div class="copyright">
@@ -198,7 +198,7 @@
                             {{break}}
                             {{end}}
                         </div>
-                    </div>
+                    </ol>
                 </div>
             </div>
             {{else if eq .Cat "artist"}}
@@ -240,9 +240,9 @@
                     <div class="header-lst-artist">
                         <p>Populaires</p>
                     </div>
-                    <div class="songs">
+                    <ol class="songs">
                         {{range .TrackListAPI.Tracks}}
-                        <div class="song-artist">
+                        <li class="song-artist">
                             <div class="info_song-artist">
                                 <div class="lis-artist">
                                     {{range .Album.Images}}
@@ -258,9 +258,9 @@
                             <div class="tmp">
                                 {{.Temps}}
                             </div>
-                        </div>
+                        </li>
                         {{end}}
-                    </div>
+                    </ol>
                     <div class="header-lst-artist listalbums">
                         <p>Discographie</p>
                     </div>

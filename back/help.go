@@ -138,6 +138,8 @@ func EditJSON(ModifiedClient []Client) {
 	// Écrire le JSON modifié dans le fichier
 	if err := os.WriteFile("JSON/login.json", modifiedJSON, 0644); err != nil {
 		fmt.Println("-----------------Erreur lors de l'écriture du fichier JSON modifié:-----------------", err)
+	}else {
+		fmt.Println("JSON modified successfully")
 	}
 }
 

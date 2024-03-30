@@ -191,13 +191,11 @@ func Category(w http.ResponseWriter, r *http.Request) {
 	back.Jeu.Cat = r.URL.Query().Get("c")
 	if r.URL.Query().Get("moveA") != "" {
 		if back.Body, back.Fail = back.RequestApi(r.URL.Query().Get("moveA")); back.Fail.Error.Status != 200 {
-			fmt.Println(r.URL.Query().Get("moveA"), "moveA")
 			fmt.Println("-----------------Erreur reading requestApi 1 catgory :-----------------", back.Fail)
 			InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
 			return
 		}
 	} else if r.URL.Query().Get("moveB") != "" {
-		fmt.Println(r.URL.Query().Get("moveB"), "moveB")
 		if back.Body, back.Fail = back.RequestApi(r.URL.Query().Get("moveB")); back.Fail.Error.Status != 200 {
 			fmt.Println("-----------------Erreur reading requestApi 2 category :-----------------", back.Fail)
 			InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
@@ -210,22 +208,19 @@ func Category(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	fmt.Println(back.Jeu.Cat)
+
 	switch back.Jeu.Cat {
 	case "playlist":
 		json.Unmarshal(back.Body, &back.Jeu.ListPlaylist)
-		//back.Playlists.Temps = back.TempsPlaylist(back.Playlists)
-
 	case "artist":
 		json.Unmarshal(back.Body, &back.Jeu.ListArtists)
-
+		for i, c := range back.Jeu.ListArtists.Artists.Items {
+			if len(c.Images) == 0 {
+				back.Jeu.ListArtists.Artists.Items[i].Images = append(back.Jeu.ListArtists.Artists.Items[i].Images, back.Images{URL: "/static/img/nopdp.png"})
+			}
+		}
 	case "album":
 		json.Unmarshal(back.Body, &back.Jeu.ListAlbums)
-		// for i := 0; i < len(back.Jeu.AlbumsDetail.Tracks.Items); i++ {
-		// 	back.Jeu.AlbumsDetail.Tracks.Items[i].Temps = back.Tmps(back.Jeu.AlbumsDetail.Tracks.Items[i].DurationMs)
-		// }
-		// back.AlbumOff.Temps = back.TempsAlbum(back.AlbumOff)
-
 	case "track":
 		json.Unmarshal(back.Body, &back.Jeu.ListTracks)
 
@@ -246,10 +241,10 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	}
 	var Follow int
 	var aime int
-	back.Jeu.ListAlbums = back.Album
-	back.Jeu.ListArtists = back.Artist
-	back.Jeu.ListPlaylist = back.Playlists
-	back.Jeu.ListTracks = back.Tracks
+	back.Jeu.ListAlbums = back.Albums{}
+	back.Jeu.ListArtists = back.Artists{}
+	back.Jeu.ListPlaylist = back.Playlist{}
+	back.Jeu.ListTracks = back.Track{}
 
 	if !Header(w, false) {
 		return
@@ -257,14 +252,14 @@ func Search(w http.ResponseWriter, r *http.Request) {
 
 	if len(back.Jeu.AllGenres.Genres) < 1 {
 		if back.Body, back.Fail = back.RequestApi("https://api.spotify.com/v1/recommendations/available-genre-seeds"); back.Fail.Error.Status != 200 {
-			fmt.Println("-----------------Erreur reading requestApi 2 category :-----------------", back.Fail)
+			fmt.Println("-----------------Erreur reading requestApi 1 search :-----------------", back.Fail)
 			InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
 			return
 		}
 		json.Unmarshal(back.Body, &back.Jeu.AllGenres)
 	}
 	var strFollow string
-	fmt.Println(search)
+
 	if r.URL.Query().Get("search") != "" {
 		search = r.URL.Query().Get("search")
 	} else if search == "" {
@@ -273,21 +268,15 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if back.Body, back.Fail = back.RequestApi("https://api.spotify.com/v1/search?q=" + search + "&type=track%2Calbum%2Cartist%2Cplaylist&offset=0&limit=10"); back.Fail.Error.Status != 200 {
-		fmt.Println("-----------------Erreur reading requestApi 3 Search :-----------------", back.Fail)
+		fmt.Println("-----------------Erreur reading requestApi 2 Search :-----------------", back.Fail)
 		InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
 		return
 	}
 
-	json.Unmarshal(back.Body, &back.Jeu.ListAlbums)
-	json.Unmarshal(back.Body, &back.Jeu.ListArtists)
-	for i, c := range back.Jeu.ListArtists.Artists.Items {
-		if len(c.Images) == 0 {
-			back.Jeu.ListArtists.Artists.Items[i].Images = append(back.Jeu.ListArtists.Artists.Items[i].Images, back.Images{URL: "/static/img/nopdp.png"})
-		}
-	}
-
-	json.Unmarshal(back.Body, &back.Jeu.ListPlaylist)
-	json.Unmarshal(back.Body, &back.Jeu.ListTracks)
+	json.Unmarshal(back.Body, &back.Album)
+	json.Unmarshal(back.Body, &back.Artist)
+	json.Unmarshal(back.Body, &back.Playlists)
+	json.Unmarshal(back.Body, &back.Tracks)
 
 	if strFollow = r.FormValue("follower"); strFollow != "" {
 		if Follow, err = strconv.Atoi(strFollow); err != nil || Follow < 0 {
@@ -299,99 +288,64 @@ func Search(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	} else {
-		fmt.Println("0")
 		Follow = 0
 	}
 
 	r.ParseForm()
 	Genre := r.Form["genre"]
-	fmt.Println(Genre)
 	if Follow > 0 {
-		fmt.Println(Follow)
-		for i, c := range back.Jeu.ListPlaylist.Playlists.Items {
+		for i, c := range back.Playlists.Playlists.Items {
 			if back.Body, back.Fail = back.RequestApi(c.Href); back.Fail.Error.Status != 200 {
 				fmt.Println("-----------------Erreur reading requestApi Playlist :-----------------", back.Fail)
 				InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
 				return
 			}
 			json.Unmarshal(back.Body, &back.PlaylistOff)
-			fmt.Println("La playlist :", back.PlaylistOff.Name, " a", back.PlaylistOff.Followers.Total)
-			fmt.Println("Il faut ", Follow, "d'abonné")
-			fmt.Printf("\n\n")
-
-			if back.PlaylistOff.Followers.Total < Follow {
-				if i >= len(back.Jeu.ListPlaylist.Playlists.Items)-1 {
-					back.Jeu.ListPlaylist.Playlists.Items = back.Jeu.ListPlaylist.Playlists.Items[:len(back.Jeu.ListPlaylist.Playlists.Items)-1]
-				} else {
-					back.Jeu.ListPlaylist.Playlists.Items = append(back.Jeu.ListPlaylist.Playlists.Items[:i], back.Jeu.ListPlaylist.Playlists.Items[i+1:]...)
-				}
-			} else {
-				fmt.Println("Assez de followers ", back.PlaylistOff.Followers.Total, " pour ", back.PlaylistOff.Name)
+			if back.PlaylistOff.Followers.Total >= Follow {
+				back.Jeu.ListPlaylist.Playlists.Items = append(back.Jeu.ListPlaylist.Playlists.Items, back.Playlists.Playlists.Items[i])
 			}
 		}
-		for i, c := range back.Jeu.ListAlbums.Albums.Items { //Filtre nul pour lui peut être voir sur une autre platforme pour récupérer les likes d'une albums
+		for i, c := range back.Album.Albums.Items { //Filtre nul pour lui peut être voir sur une autre platforme pour récupérer les likes d'un albums (deezer)
 			if back.Body, back.Fail = back.RequestApi(c.Artists[0].Href); back.Fail.Error.Status != 200 {
 				fmt.Println("-----------------Erreur reading requestApi Albums :-----------------", back.Fail)
 				InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
 				return
 			}
 			json.Unmarshal(back.Body, &back.ArtistOff)
-			fmt.Println("L' artist :", back.ArtistOff.Name, " a", back.ArtistOff.Followers.Total)
-			fmt.Println("Il faut ", Follow, "d'abonné")
-			fmt.Printf("\n\n")
-
-			if back.ArtistOff.Followers.Total < Follow {
-				if i >= len(back.Jeu.ListAlbums.Albums.Items)-1 {
-					back.Jeu.ListAlbums.Albums.Items = back.Jeu.ListAlbums.Albums.Items[:len(back.Jeu.ListAlbums.Albums.Items)-1]
-				} else {
-					back.Jeu.ListAlbums.Albums.Items = append(back.Jeu.ListAlbums.Albums.Items[:i], back.Jeu.ListAlbums.Albums.Items[i+1:]...)
-				}
-			} else {
-				fmt.Println("Assez de followers ", back.ArtistOff.Followers.Total, " pour ", back.ArtistOff.Name)
+			fmt.Println(back.ArtistOff.Followers.Total)
+			if back.ArtistOff.Followers.Total >= Follow {
+				back.Jeu.ListAlbums.Albums.Items = append(back.Jeu.ListAlbums.Albums.Items, back.Album.Albums.Items[i])
 			}
 		}
-		for i, c := range back.Jeu.ListArtists.Artists.Items {
+		for i, c := range back.Artist.Artists.Items {
 			if back.Body, back.Fail = back.RequestApi(c.Href); back.Fail.Error.Status != 200 {
 				fmt.Println("-----------------Erreur reading requestApi Artists :-----------------", back.Fail)
 				InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
 				return
 			}
 			json.Unmarshal(back.Body, &back.ArtistOff)
-			fmt.Println("L'artist :", back.ArtistOff.Name, " a", back.ArtistOff.Followers.Total)
-			fmt.Println("Il faut ", Follow, "d'abonné")
-			fmt.Printf("\n\n")
 
-			if back.ArtistOff.Followers.Total < Follow {
-				if i >= len(back.Jeu.ListArtists.Artists.Items)-1 {
-					back.Jeu.ListArtists.Artists.Items = back.Jeu.ListArtists.Artists.Items[:len(back.Jeu.ListArtists.Artists.Items)-1]
-				} else {
-					back.Jeu.ListArtists.Artists.Items = append(back.Jeu.ListArtists.Artists.Items[:i], back.Jeu.ListArtists.Artists.Items[i+1:]...)
-				}
-			} else {
-				fmt.Println("Assez de followers ", back.ArtistOff.Followers.Total, " pour ", back.ArtistOff.Name)
-			}
-		}
-		for i, c := range back.Jeu.ListTracks.Tracks.Items {
-			if len(c.Artists) > 0 {
-				if aime, _ = strconv.Atoi(back.Like(c.Name + " " + c.Artists[0].Name)); aime < Follow {
-					fmt.Println("Le son :", c.Name, " a", aime)
-					fmt.Println("Il faut ", Follow, "d'abonné")
-					fmt.Printf("\n\n")
-					if i >= len(back.Jeu.ListTracks.Tracks.Items)-1 {
-						back.Jeu.ListTracks.Tracks.Items = back.Jeu.ListTracks.Tracks.Items[:len(back.Jeu.ListTracks.Tracks.Items)-1]
-					} else {
-						back.Jeu.ListTracks.Tracks.Items = append(back.Jeu.ListTracks.Tracks.Items[:i], back.Jeu.ListTracks.Tracks.Items[i+1:]...)
-					}
-				} else {
-					fmt.Println("Assez de followers ", aime, " pour ", c.Artists[0].Name)
-				}
-			} else {
+			if back.ArtistOff.Followers.Total >= Follow {
 				fmt.Println(c.Name)
+				back.Jeu.ListArtists.Artists.Items = append(back.Jeu.ListArtists.Artists.Items, back.Artist.Artists.Items[i])
 			}
 		}
+		for i, c := range back.Tracks.Tracks.Items {
+			if len(c.Artists) > 0 {
+				if aime, _ = strconv.Atoi(back.Like(c.Name + " " + c.Artists[0].Name)); aime >= Follow {
+					back.Jeu.ListTracks.Tracks.Items = append(back.Jeu.ListTracks.Tracks.Items, back.Tracks.Tracks.Items[i])
+				} else {
+					fmt.Println("son ", aime)
+				}
+			}
+		}
+	} else {
+		back.Jeu.ListPlaylist = back.Playlists
+		back.Jeu.ListAlbums = back.Album
+		back.Jeu.ListTracks = back.Tracks
+		back.Jeu.ListArtists = back.Artist
 	}
 	if len(Genre) > 0 {
-		fmt.Println(Genre)
 		for i, c := range back.Jeu.ListPlaylist.Playlists.Items {
 			if back.Body, back.Fail = back.RequestApi(c.Href); back.Fail.Error.Status != 200 {
 				fmt.Println("-----------------Erreur reading requestApi 2 Playlist :-----------------", back.Fail)
@@ -401,39 +355,49 @@ func Search(w http.ResponseWriter, r *http.Request) {
 			json.Unmarshal(back.Body, &back.PlaylistOff)
 			for _, j := range back.PlaylistOff.Tracks.Items {
 				for _, k := range j.Track.Artists {
-					if !back.IsElementPresent(k.Genres, Genre) {
-						back.Jeu.ListPlaylist.Playlists.Items = append(back.Jeu.ListPlaylist.Playlists.Items[:i], back.Jeu.ListPlaylist.Playlists.Items[i+1:]...)
+					if back.IsElementPresent(k.Genres, Genre) {
+						back.Jeu.ListPlaylist.Playlists.Items = append(back.Jeu.ListPlaylist.Playlists.Items, back.Playlists.Playlists.Items[i])
 					}
 				}
 			}
 		}
 		for i, c := range back.Jeu.ListAlbums.Albums.Items {
-			if back.Body, back.Fail = back.RequestApi(c.Artists[0].Href); back.Fail.Error.Status != 200 {
-				fmt.Println("-----------------Erreur reading requestApi 2 Albums :-----------------", back.Fail)
-				InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
-				return
-			}
-			json.Unmarshal(back.Body, &back.ArtistOff)
-			if !back.IsElementPresent(back.ArtistOff.Genres, Genre) {
-				back.Jeu.ListAlbums.Albums.Items = append(back.Jeu.ListAlbums.Albums.Items[:i], back.Jeu.ListAlbums.Albums.Items[i+1:]...)
+			if len(c.Artists) > 0 {
+				if back.Body, back.Fail = back.RequestApi(c.Artists[0].Href); back.Fail.Error.Status != 200 {
+					fmt.Println("-----------------Erreur reading requestApi 2 Albums :-----------------", back.Fail)
+					InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
+					return
+				}
+				json.Unmarshal(back.Body, &back.ArtistOff)
+				if back.IsElementPresent(back.ArtistOff.Genres, Genre) {
+					back.Jeu.ListAlbums.Albums.Items = append(back.Jeu.ListAlbums.Albums.Items, back.Album.Albums.Items[i])
+				}
 			}
 		}
-		for i, c := range back.Jeu.ListArtists.Artists.Items {
+		for i, c := range back.Artist.Artists.Items {
 			if back.Body, back.Fail = back.RequestApi(c.Href); back.Fail.Error.Status != 200 {
 				fmt.Println("-----------------Erreur reading requestApi 2 Artists :-----------------", back.Fail)
 				InitTemps.Temp.ExecuteTemplate(w, strconv.Itoa(back.Fail.Error.Status), back.Jeu)
 				return
 			}
 			json.Unmarshal(back.Body, &back.ArtistOff)
-			if !back.IsElementPresent(back.ArtistOff.Genres, Genre) {
-				back.Jeu.ListArtists.Artists.Items = append(back.Jeu.ListArtists.Artists.Items[:i], back.Jeu.ListArtists.Artists.Items[i+1:]...)
+			if back.IsElementPresent(back.ArtistOff.Genres, Genre) {
+				back.Jeu.ListArtists.Artists.Items = append(back.Jeu.ListArtists.Artists.Items, back.Artist.Artists.Items[i])
 			}
 		}
-		for i, c := range back.Jeu.ListTracks.Tracks.Items {
-			if !back.IsElementPresent(c.Artists[0].Genres, Genre) {
-				back.Jeu.ListTracks.Tracks.Items = append(back.Jeu.ListTracks.Tracks.Items[:i], back.Jeu.ListTracks.Tracks.Items[i+1:]...)
+		for i, c := range back.Tracks.Tracks.Items {
+			if len(c.Artists) > 0 {
+				if back.IsElementPresent(c.Artists[0].Genres, Genre) {
+					back.Jeu.ListTracks.Tracks.Items = append(back.Jeu.ListTracks.Tracks.Items, back.Tracks.Tracks.Items[i])
+				}
 			}
 		}
+	}
+	if Follow == 0 && len(Genre) == 0 {
+		json.Unmarshal(back.Body, &back.Jeu.ListAlbums)
+		json.Unmarshal(back.Body, &back.Jeu.ListArtists)
+		json.Unmarshal(back.Body, &back.Jeu.ListPlaylist)
+		json.Unmarshal(back.Body, &back.Jeu.ListTracks)
 	}
 	fmt.Println(r.FormValue("alpha"))
 	if r.FormValue("alpha") == "ok" {
@@ -445,6 +409,17 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < len(back.Jeu.ListTracks.Tracks.Items); i++ {
 		back.Jeu.ListTracks.Tracks.Items[i].Temps = back.Tmps(back.Jeu.ListTracks.Tracks.Items[i].DurationMs)
 	}
+	for i, c := range back.Jeu.ListArtists.Artists.Items {
+		if len(c.Images) == 0 {
+			back.Jeu.ListArtists.Artists.Items[i].Images = append(back.Jeu.ListArtists.Artists.Items[i].Images, back.Images{URL: "/static/img/nopdp.png"})
+		}
+	}
+	back.Jeu.ListTracks.Tracks.Total =len(back.Jeu.ListTracks.Tracks.Items)
+	back.Jeu.ListPlaylist.Playlists.Total =len(back.Jeu.ListPlaylist.Playlists.Items)
+	back.Jeu.ListAlbums.Albums.Total =len(back.Jeu.ListAlbums.Albums.Items)
+	back.Jeu.ListArtists.Artists.Total =len(back.Jeu.ListArtists.Artists.Items)
+
+	fmt.Println(back.Jeu.ListPlaylist, back.Jeu.ListAlbums, back.Jeu.ListArtists, back.Jeu.ListTracks)
 	InitTemps.Temp.ExecuteTemplate(w, "search", back.Jeu)
 }
 
@@ -588,7 +563,6 @@ func InitFav(w http.ResponseWriter, r *http.Request) {
 }
 
 func Suppr(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(back.Jeu.UtilisateurData.Connect)
 	if back.Jeu.UtilisateurData.Connect {
 		if back.LstUser, err = back.ReadJSON(); err != nil {
 			fmt.Println("-----------------Error ID Suppr-----------------", err.Error())
@@ -597,35 +571,37 @@ func Suppr(w http.ResponseWriter, r *http.Request) {
 
 		queryHref := r.URL.Query().Get("href") //Récupére l'Id donné dans le Query string
 		queryType := r.URL.Query().Get("type") //Récupére le type donné dans le Query string
-		fmt.Println(back.Jeu.Utilisateur)
 		switch queryType {
 		case "playlist":
 			for i, c := range back.Jeu.Utilisateur.FavorisPlaylist {
-				fmt.Println(c)
-				fmt.Println(queryHref)
 				if c == queryHref {
-					back.Jeu.Utilisateur.FavorisPlaylist = append(back.Jeu.Utilisateur.FavorisPlaylist[:i], back.Jeu.Utilisateur.FavorisPlaylist[i+1:]...) //Supprime de la liste des personnage
+					back.Jeu.Utilisateur.FavorisPlaylist = append(back.Jeu.Utilisateur.FavorisPlaylist[:i], back.Jeu.Utilisateur.FavorisPlaylist[i+1:]...)
+					back.Jeu.UtilisateurData.FavorisPlaylist = append(back.Jeu.UtilisateurData.FavorisPlaylist[:i], back.Jeu.UtilisateurData.FavorisPlaylist[i+1:]...)
 					break
 				}
 			}
 		case "artist":
 			for i, c := range back.Jeu.Utilisateur.FavorisArtist {
 				if c == queryHref {
-					back.Jeu.Utilisateur.FavorisArtist = append(back.Jeu.Utilisateur.FavorisArtist[:i], back.Jeu.Utilisateur.FavorisArtist[i+1:]...) //Supprime de la liste des personnage
+					back.Jeu.Utilisateur.FavorisArtist = append(back.Jeu.Utilisateur.FavorisArtist[:i], back.Jeu.Utilisateur.FavorisArtist[i+1:]...)
+					back.Jeu.UtilisateurData.FavorisArtists = append(back.Jeu.UtilisateurData.FavorisArtists[:i], back.Jeu.UtilisateurData.FavorisArtists[i+1:]...)
 					break
 				}
 			}
 		case "album":
 			for i, c := range back.Jeu.Utilisateur.FavorisAlbum {
 				if c == queryHref {
-					back.Jeu.Utilisateur.FavorisAlbum = append(back.Jeu.Utilisateur.FavorisAlbum[:i], back.Jeu.Utilisateur.FavorisAlbum[i+1:]...) //Supprime de la liste des personnage
+					back.Jeu.Utilisateur.FavorisAlbum = append(back.Jeu.Utilisateur.FavorisAlbum[:i], back.Jeu.Utilisateur.FavorisAlbum[i+1:]...)
+					back.Jeu.UtilisateurData.FavorisAlbums = append(back.Jeu.UtilisateurData.FavorisAlbums[:i], back.Jeu.UtilisateurData.FavorisAlbums[i+1:]...)
+
 					break
 				}
 			}
 		case "track":
 			for i, c := range back.Jeu.Utilisateur.FavorisTrack {
 				if c == queryHref {
-					back.Jeu.Utilisateur.FavorisTrack = append(back.Jeu.Utilisateur.FavorisTrack[:i], back.Jeu.Utilisateur.FavorisTrack[i+1:]...) //Supprime de la liste des personnage
+					back.Jeu.Utilisateur.FavorisTrack = append(back.Jeu.Utilisateur.FavorisTrack[:i], back.Jeu.Utilisateur.FavorisTrack[i+1:]...)
+					back.Jeu.UtilisateurData.FavorisTracks = append(back.Jeu.UtilisateurData.FavorisTracks[:i], back.Jeu.UtilisateurData.FavorisTracks[i+1:]...)
 					break
 				}
 			}
@@ -649,6 +625,7 @@ func Suppr(w http.ResponseWriter, r *http.Request) {
 		if len(back.Jeu.Utilisateur.FavorisAlbum) == 0 && len(back.Jeu.Utilisateur.FavorisArtist) == 0 && len(back.Jeu.Utilisateur.FavorisPlaylist) == 0 && len(back.Jeu.Utilisateur.FavorisTrack) == 0 {
 			back.Jeu.UtilisateurData.Fav = false
 		}
+
 		if !Header(w, true) {
 			return
 		}

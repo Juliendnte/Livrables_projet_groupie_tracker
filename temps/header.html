@@ -48,16 +48,16 @@
             {{range .UtilisateurData.FavorisPlaylist}}
             <a href="/detail?href={{.Href}}&type={{.Type}}" class="header-track">
                 <div class="img-track">
-                    {{range .Images}} {{if eq .Width 640}}
+                    {{range .Images}}
                     <img src="{{.URL}}" alt="" height="100%" />
-                    {{break}} {{end}} {{end}}
+                    {{break}} {{end}}
                 </div>
                 <div class="info-global">
                     <div class="info-titre">
                         <p><strong>{{.Name}}</strong></p>
                     </div>
                     <div class="info-artist">
-                       <p>{{.Owner.DisplayName}}</p>
+                        <p>{{.Owner.DisplayName}}</p>
                     </div>
                     <div class="info-date">
                         <p>{{.Temps}}</p>
@@ -77,7 +77,7 @@
                         <p><strong>{{.Name}}</strong></p>
                     </div>
                     <div class="info-artist">
-                       <p>Artist</p>
+                        <p>Artist</p>
                     </div>
                 </div>
             </a>
@@ -94,7 +94,7 @@
                         <p><strong>{{.Name}}</strong></p>
                     </div>
                     <div class="info-artist">
-                       <p>Track</p>
+                        <p>Track</p>
                     </div>
                 </div>
             </a>

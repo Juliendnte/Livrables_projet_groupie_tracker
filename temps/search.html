@@ -8,11 +8,11 @@
     <title>Search</title>
     <link rel="stylesheet" href="../static/css/base.css">
     <link rel="stylesheet" href="../static/css/search.css">
-    <link rel="icon" href="/static/img/spot.png" />
+    <link rel="icon" href="/assets/img/logo/spot.png" />
 </head>
 
 <body>
-    <div class="up">
+    <div id="content" class="up">
         {{template "header" .}}
         <section class="body-global">
             <div class="connection-global">
@@ -149,8 +149,13 @@
                 </form>
             </div>
             <div class="main">
+                {{if and (eq .ListArtists.Artists.Total 0) (eq .ListAlbums.Albums.Total 0) (eq .ListPlaylist.Playlists.Total 0) (eq .ListTracks.Tracks.Total 0)}}
+                    <p class="pas_trouve">Nous n'avons pas trouvé de ressource suite à votre recherche </p>
+                {{else}}
                 <div class="container">
+                    <p>a</p>
                     {{if ne .ListArtists.Artists.Total 0}}
+                    <p>a</p>
                     <div class="Nom">
                         <p>Artistes</p>
                     </div>
@@ -179,7 +184,10 @@
                     {{end}}
                 </div>
                 <div class="container">
+                    <p>a</p>
                     {{if ne .ListAlbums.Albums.Total 0}}
+                    <p>a</p>
+
                     <div class="Nom">
                         <p>Albums</p>
                     </div>
@@ -204,7 +212,9 @@
                     {{end}}
                 </div>
                 <div class="container">
+                    <p>a</p>
                     {{if ne .ListPlaylist.Playlists.Total 0}}
+                    <p>a</p>
                     <div class="Nom">
                         <p>Playlist</p>
                     </div>
@@ -229,7 +239,9 @@
                     {{end}}
                 </div>
                 <div class="container">
+                    <p>a</p>
                     {{if ne .ListTracks.Tracks.Total 0}}
+                    <p>a</p>
                     <div class="Nom">
                         <p>Track</p>
                     </div>
@@ -254,6 +266,7 @@
                     </div>
                     {{end}}
                 </div>
+                {{end}}
             </div>
         </section>
     </div>

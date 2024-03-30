@@ -8,24 +8,28 @@
     <title>Favoris</title>
     <link rel="icon" href="/static/img/logo/spot.png" />
     <link rel="stylesheet" href="/static/css/log.css" />
+    <link rel="stylesheet" href="/static/css/search.css" />
 </head>
 
 <body>
-    <div class="global">
+    <div id="content" class="global">
         <div class="fav-head">
             <div class="home">
                 <a href="/index" class="pdp-fav">Accueil</a>
             </div>
             <div class="logo-fav">
                 {{if eq .Utilisateur.Img "vert"}}
-                <form action="/img" method="post" enctype="multipart/form-data">
+                <form id="uploadForm" action="/img" method="post" enctype="multipart/form-data" onchange="submitForm()">
                     <input id="fileInput" name="Img" type="file" accept="image/png, image/jpeg" style="display: none;">
-                    <label for="fileInput" id="customButton" class="input-img"></label>
-                    <input type="submit" id="submitButton" value="envoyer">
+                    <label for="fileInput" class="input-img"></label>
+                    <input type="submit" style="display: none;">
                     <p class="vert">{{.Utilisateur.Letter}}</p>
                 </form>
                 {{else}}
-                <form action="/img" method="post">
+                <form id="uploadForm" action="/img" method="post" enctype="multipart/form-data" onchange="submitForm()">
+                    <input id="fileInput" name="Img" type="file" accept="image/png, image/jpeg" style="display: none;">
+                    <label for="fileInput" class="input-img"></label>
+                    <input type="submit" style="display: none;">
                     <img src="/static/img/{{.Utilisateur.Img}}" class="pdp-fav" />
                 </form>
                 {{end}}
@@ -34,61 +38,135 @@
             </div>
             <div></div>
         </div>
-        <div class="favoris">
-            <div class="artist">
-                {{range .ListArtistsDetail}}
-                <div class="profil">
-                    {{range .Images}}
-                    <img src="{{.URL}}" alt="pdp_artiste">
-                    {{break}}
-                    {{end}}
-                    <p>{{.Name}}</p>
+        <div class="main">
+            {{$hvFav := false}}
+            {{range .ListArtistsDetail}}
+            {{if ne .Name ""}}
+            {{$hvFav = true}}
+            {{end}}
+            {{end}}
+            {{range .ListAlbumsDetail}}
+            {{if ne .Name ""}}
+            {{$hvFav = true}}
+            {{end}}
+            {{end}}
+            {{range .ListPlaylistDetail}}
+            {{if ne .Name ""}}
+            {{$hvFav = true}}
+            {{end}}
+            {{end}}
+            {{range .ListTracksDetail}}
+            {{if ne .Name ""}}
+            {{$hvFav = true}}
+            {{end}}
+            {{end}}
+            {{if $hvFav}}
+            <div class="container">
+                <div class="Nom">
+                    <p>Artistes</p>
                 </div>
-                {{end}}
-            </div>
-            <div class="album">
-                {{range .ListAlbumsDetail}}
-                <div class="profil">
-                    {{range .Images}}
-                    <img src="{{.URL}}" alt="pdp_artiste">
-                    {{break}}
+                <div class="artist">
+                    {{range .ListArtistsDetail}}
+                    <div class="artist-individual">
+                        <a href="/detail?href={{.Href}}&type=artist" class="pdp">
+                            {{range .Images}}
+                            {{if and (ne .URL "") (ne .URL nil)}}
+                            <img src="{{.URL}}" alt="pdp artist">
+                            {{else}}
+                            <img src="/static/img/nopdp.png" alt="pdp artist">
+                            {{end}}
+                            {{break}}
+                            {{end}}
+                        </a>
+                        <div class="blaze">
+                            <p>{{.Name}}</p>
+                        </div>
+                        <div class="detail">
+                            <p>Artist</p>
+                        </div>
+                    </div>
                     {{end}}
-                    <p>{{.Name}}</p>
                 </div>
-                {{end}}
             </div>
-            <div class="track">
-                {{range .ListTracksDetail}}
-                <div class="profil">
-                    {{range .Album.Images}}
-                    <img src="{{.URL}}" alt="pdp_artiste">
-                    {{break}}
+            <div class="container">
+                <div class="Nom">
+                    <p>Albums</p>
+                </div>
+                <div class="album">
+                    {{range .ListAlbumsDetail}}
+                    <div class="album-individual">
+                        <a href="/detail?href={{.Href}}&type=album" class="pdp-album">
+                            {{range .Images}}
+                            <img src="{{.URL}}" alt="pdp album">
+                            {{break}}
+                            {{end}}
+                        </a>
+                        <div class="blaze">
+                            <p>{{.Name}}</p>
+                        </div>
+                        <div class="detail">
+                            <p>{{.ReleaseDate}} • {{range .Artists}}{{.Name}}{{end}}</p>
+                        </div>
+                    </div>
                     {{end}}
-                    <p>{{.Name}}</p>
                 </div>
-                {{end}}
             </div>
-            <div class="playlist">
-                {{range .ListPlaylistDetail}}
-                <div class="profil">
-                    {{range .Images}}
-                    <img src="{{.URL}}" alt="pdp_artiste">
-                    {{break}}
+            <div class="container">
+                <div class="Nom">
+                    <p>Playlist</p>
+                </div>
+                <div class="playlist">
+                    {{range .ListPlaylistDetail}}
+                    <div class="playlist-individual">
+                        <a href="/detail?href={{.Href}}&type=playlist" class="pdp-playlist">
+                            {{range .Images}}
+                            <img src="{{.URL}}" alt="pdp-playlist">
+                            {{break}}
+                            {{end}}
+                        </a>
+                        <div class="blaze">
+                            <p>{{.Name}}</p>
+                        </div>
+                        <div class="detail">
+                            <p>Par {{.Owner.DisplayName}}</p>
+                        </div>
+                    </div>
                     {{end}}
-                    <p>{{.Name}}</p>
                 </div>
-                {{end}}
             </div>
+            <div class="container">
+                <div class="Nom">
+                    <p>Track</p>
+                </div>
+                <div class="track">
+                    {{range .ListTracksDetail}}
+                    <a href="/detail?href={{.Href}}&type=track"  class="playlist-individual">
+                        {{range .Album.Images}}
+                        <div class="pdp-playlist">
+                            <img src="{{.URL}}" alt="pdp-playlist">
+                        </div>
+                        {{break}}
+                        {{end}}
+                        <div class="blaze">
+                            <p>{{.Name}}</p>
+                        </div>
+                        <div class="detail song">
+                            <p>Par {{range .Artists}}{{.Name}}, {{end}}</p>
+                            <p>{{.Temps}}</p>
+                        </div>
+                    </a>
+                    {{end}}
+                </div>
+            </div>
+            {{else}}
+            <p>Aucun Favoris</p>
+            {{end}}
         </div>
     </div>
     <script>
-        document.getElementById('fileInput').addEventListener('change', function () {
-            var file = this.files[0];
-            if (file) {
-                console.log("envoyer")
-                //document.getElementById('submitButton').disabled = false;
-            }
-        });
+        function submitForm() {
+            document.getElementById('uploadForm').submit();
+        }
     </script>
 </body>
 

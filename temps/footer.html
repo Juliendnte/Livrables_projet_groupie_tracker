@@ -124,10 +124,7 @@
     });
 
     document.addEventListener("readystatechange", function (event) {
-        if (document.readyState === "loading") {
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('content').style.display = 'none';
-        } else if (document.readyState === "complete") {
+        if (document.readyState === "complete") {
             document.getElementById('loader').style.display = 'none';
             document.getElementById('content').style.display = 'flex';
         }
