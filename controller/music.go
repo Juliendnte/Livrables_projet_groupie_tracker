@@ -123,6 +123,7 @@ func Detail(w http.ResponseWriter, r *http.Request) {
 		back.PlaylistOff.Temps = back.PlaylistOff.TempsPlaylist()
 		for i := 0; i < len(back.PlaylistOff.Tracks.Items); i++ {
 			back.PlaylistOff.Tracks.Items[i].Track.Temps = back.Tmps(back.PlaylistOff.Tracks.Items[i].Track.DurationMs)
+			back.PlaylistOff.Tracks.Items[i].AddedAt = back.PlaylistOff.Tracks.Items[i].AddedAt[:10]
 		}
 		back.Jeu.PlaylistDetail = back.PlaylistOff
 	case "artist":
@@ -148,18 +149,16 @@ func Detail(w http.ResponseWriter, r *http.Request) {
 			back.Jeu.TrackListAPI.Tracks[i].Like = back.Like(back.Jeu.TrackListAPI.Tracks[i].Name + " " + back.Jeu.TrackListAPI.Tracks[i].Artists[0].Name)
 		}
 	case "album":
-		json.Unmarshal(back.Body, &back.AlbumOff)
+		json.Unmarshal(back.Body, &back.Jeu.AlbumsDetail)
 		milsec := 0
 		for i := 0; i < len(back.Jeu.AlbumsDetail.Tracks.Items); i++ {
 			milsec += back.Jeu.AlbumsDetail.Tracks.Items[i].DurationMs
 			back.Jeu.AlbumsDetail.Tracks.Items[i].Temps = back.Tmps(back.Jeu.AlbumsDetail.Tracks.Items[i].DurationMs)
 		}
 		back.Jeu.AlbumsDetail.Temps = back.Tmps(milsec)
-		back.AlbumOff.Temps = back.AlbumOff.TempsAlbum()
-		back.Jeu.AlbumsDetail = back.AlbumOff
+		back.Jeu.AlbumsDetail.Temps = back.Jeu.AlbumsDetail.TempsAlbum()
 	case "track":
-		json.Unmarshal(back.Body, &back.TrackOff)
-		back.Jeu.TracksDetail = back.TrackOff
+		json.Unmarshal(back.Body, &back.Jeu.TracksDetail)
 		back.Jeu.TracksDetail.Temps = back.Tmps(back.Jeu.TracksDetail.DurationMs)
 		back.Jeu.TracksDetail.Like = back.Like(back.Jeu.TracksDetail.Name + " " + back.Jeu.TracksDetail.Artists[0].Name)
 		if back.Body, back.Fail = back.RequestApi(back.Jeu.TracksDetail.Album.Href); back.Fail.Error.Status != 200 {

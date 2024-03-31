@@ -88,7 +88,7 @@
 .horloge{
     width: 32px;
     height: 32px;
-    margin-right: 36px;
+    margin-right: 30px;
 }
 
 .song{
@@ -109,10 +109,7 @@
     overflow: hidden;
 }
 
-.feat,
-.tmp,
-.header-lst,
-.like-artist{
+.body-global{
     color: var(--gray-light);
 }
 
