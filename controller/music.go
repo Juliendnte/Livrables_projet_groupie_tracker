@@ -311,7 +311,6 @@ func Search(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			json.Unmarshal(back.Body, &back.ArtistOff)
-			fmt.Println(back.ArtistOff.Followers.Total)
 			if back.ArtistOff.Followers.Total >= Follow {
 				back.Jeu.ListAlbums.Albums.Items = append(back.Jeu.ListAlbums.Albums.Items, back.Album.Albums.Items[i])
 			}
@@ -325,7 +324,6 @@ func Search(w http.ResponseWriter, r *http.Request) {
 			json.Unmarshal(back.Body, &back.ArtistOff)
 
 			if back.ArtistOff.Followers.Total >= Follow {
-				fmt.Println(c.Name)
 				back.Jeu.ListArtists.Artists.Items = append(back.Jeu.ListArtists.Artists.Items, back.Artist.Artists.Items[i])
 			}
 		}
@@ -333,9 +331,7 @@ func Search(w http.ResponseWriter, r *http.Request) {
 			if len(c.Artists) > 0 {
 				if aime, _ = strconv.Atoi(back.Like(c.Name + " " + c.Artists[0].Name)); aime >= Follow {
 					back.Jeu.ListTracks.Tracks.Items = append(back.Jeu.ListTracks.Tracks.Items, back.Tracks.Tracks.Items[i])
-				} else {
-					fmt.Println("son ", aime)
-				}
+				} 
 			}
 		}
 	} else {
@@ -398,7 +394,6 @@ func Search(w http.ResponseWriter, r *http.Request) {
 		json.Unmarshal(back.Body, &back.Jeu.ListPlaylist)
 		json.Unmarshal(back.Body, &back.Jeu.ListTracks)
 	}
-	fmt.Println(r.FormValue("alpha"))
 	if r.FormValue("alpha") == "ok" {
 		back.Jeu.ListPlaylist.InsertionSortPlaylist()
 		back.Jeu.ListAlbums.InsertionSortAlbums()
@@ -418,7 +413,6 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	back.Jeu.ListAlbums.Albums.Total =len(back.Jeu.ListAlbums.Albums.Items)
 	back.Jeu.ListArtists.Artists.Total =len(back.Jeu.ListArtists.Artists.Items)
 
-	fmt.Println(back.Jeu.ListPlaylist, back.Jeu.ListAlbums, back.Jeu.ListArtists, back.Jeu.ListTracks)
 	InitTemps.Temp.ExecuteTemplate(w, "search", back.Jeu)
 }
 

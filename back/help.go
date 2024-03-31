@@ -25,7 +25,6 @@ var Err error
 
 // Demande a l'api son corps sous un format JSON et le met dans une structure
 func RequestApi(apiURL string) ([]byte, ErreurApi) {
-	fmt.Println(apiURL)
 	//Initialisation du client
 	httpClient := http.Client{
 		Timeout: time.Second * 10, //Timeout après 10 seconds
@@ -226,7 +225,6 @@ func RandOffset() string {
 
 // Fonction trie insertion pour le nom
 func (arrayToSort *Playlist) InsertionSortPlaylist() {
-	fmt.Println("Playlist en cours de trie...")
 	for index := 1; index < len(arrayToSort.Playlists.Items); index++ {
 		currentItem := arrayToSort.Playlists.Items[index]
 		currentLeftIndex := index - 1
@@ -238,11 +236,9 @@ func (arrayToSort *Playlist) InsertionSortPlaylist() {
 
 		arrayToSort.Playlists.Items[currentLeftIndex+1] = currentItem
 	}
-	fmt.Println("Trie finie")
 }
 
 func (arrayToSort *Artists) InsertionSortArtists() {
-	fmt.Println("Artists en cours de trie...")
 	for index := 1; index < len(arrayToSort.Artists.Items); index++ {
 		currentItem := arrayToSort.Artists.Items[index]
 		currentLeftIndex := index - 1
@@ -254,11 +250,9 @@ func (arrayToSort *Artists) InsertionSortArtists() {
 
 		arrayToSort.Artists.Items[currentLeftIndex+1] = currentItem
 	}
-	fmt.Println("Trie finie")
 }
 
 func (arrayToSort *Albums) InsertionSortAlbums() {
-	fmt.Println("Albums en cours de trie...")
 	for index := 1; index < len(arrayToSort.Albums.Items); index++ {
 		currentItem := arrayToSort.Albums.Items[index]
 		currentLeftIndex := index - 1
@@ -270,11 +264,9 @@ func (arrayToSort *Albums) InsertionSortAlbums() {
 
 		arrayToSort.Albums.Items[currentLeftIndex+1] = currentItem
 	}
-	fmt.Println("Trie finie")
 }
 
 func (arrayToSort *Track) InsertionSortTracks() {
-	fmt.Println("Track en cours de trie...")
 	for index := 1; index < len(arrayToSort.Tracks.Items); index++ {
 		currentItem := arrayToSort.Tracks.Items[index]
 		currentLeftIndex := index - 1
@@ -286,7 +278,6 @@ func (arrayToSort *Track) InsertionSortTracks() {
 
 		arrayToSort.Tracks.Items[currentLeftIndex+1] = currentItem
 	}
-	fmt.Println("Trie finie")
 }
 
 func (alb AlbumPrecision) TempsAlbum() string {

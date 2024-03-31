@@ -110,8 +110,6 @@ func InitInscription(w http.ResponseWriter, r *http.Request) {
 	for _, c := range back.LstUser {
 		if back.User.Name == c.Name {
 			if back.User.Mdp == c.Mdp {
-				fmt.Println(back.User.Name, c.Name)
-				fmt.Println(back.User.Mdp, c.Mdp)
 				http.Error(w, "Username already exists", http.StatusConflict)
 				return
 			}
